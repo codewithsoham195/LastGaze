@@ -1,0 +1,29 @@
+{
+  "summary": "Retested manifesto line overflow after clamp fix (1.9rem min). All 4 viewports x 2 URLs = 8 tests PASS. No horizontal overflow detected anywhere.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_results_per_viewport": {
+    "/index.html": {
+      "375x812": {"status": "PASS", "innerWidth": 375, "docScrollWidth": 375, "maxLineRight": 359.00},
+      "360x780": {"status": "PASS", "innerWidth": 360, "docScrollWidth": 360, "maxLineRight": 344.00},
+      "320x568": {"status": "PASS", "innerWidth": 320, "docScrollWidth": 320, "maxLineRight": 305.77},
+      "1440x900": {"status": "PASS", "innerWidth": 1440, "docScrollWidth": 1440, "maxLineRight": 1336.00}
+    },
+    "/lastgaze-site/index.html": {
+      "375x812": {"status": "PASS", "innerWidth": 375, "docScrollWidth": 375, "maxLineRight": 359.00},
+      "360x780": {"status": "PASS", "innerWidth": 360, "docScrollWidth": 360, "maxLineRight": 344.00},
+      "320x568": {"status": "PASS", "innerWidth": 320, "docScrollWidth": 320, "maxLineRight": 305.77},
+      "1440x900": {"status": "PASS", "innerWidth": 1440, "docScrollWidth": 1440, "maxLineRight": 1336.00}
+    }
+  },
+  "action_items": [],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100% (8/8)"},
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Overflow bug fully resolved. clamp(1.9rem,9vw,8rem) yields resolved font-size = 9vw at all viewports <=889px (since 9vw > 1.9rem when vw>=337px, but at 320px 9vw=28.8px still fits within the 32px padding-adjusted box). All three lines ('We hunt.', 'You wear.', 'No restocks.') fit inside innerWidth on 320/360/375/1440. docScrollWidth === innerWidth everywhere. Both /index.html and /lastgaze-site/index.html mirror behaviour exactly."
+}
