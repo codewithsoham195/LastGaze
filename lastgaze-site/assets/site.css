@@ -3,7 +3,7 @@
    Two surfaces only: INK and PAPER. Everything inverts.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 :root{
   --ink:#050505;
@@ -259,6 +259,38 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .stack{display:grid;gap:22px;align-content:center}
 
 .manifesto p{font-size:clamp(1.15rem,2.4vw,1.9rem);line-height:1.32;letter-spacing:-.015em;max-width:22ch}
+
+/* ---- manifesto hero (WE HUNT / YOU WEAR / NO RESTOCKS) ---- */
+.manifesto-hero{display:grid;gap:clamp(28px,4vw,56px);max-width:1280px}
+.mf-stack{
+  display:grid;gap:clamp(2px,.4vw,10px);
+  font-family:var(--display);
+  font-style:italic;
+  font-variation-settings:'wdth' 125,'wght' 900;
+  font-size:clamp(3.4rem,13.2vw,11.8rem);
+  line-height:.88;letter-spacing:-.045em;
+  text-transform:uppercase;
+}
+.mf-line{display:block;position:relative;will-change:transform,opacity}
+.mf-solid{color:var(--fg)}
+.mf-outline{
+  color:transparent;
+  -webkit-text-stroke:1.4px var(--fg);
+  text-stroke:1.4px var(--fg);
+  padding-left:clamp(6px,1.1vw,18px);
+}
+@media(min-width:900px){
+  .mf-outline{-webkit-text-stroke-width:1.8px;text-stroke-width:1.8px}
+}
+.mf-body{
+  font-size:clamp(1rem,1.45vw,1.22rem);
+  line-height:1.55;max-width:62ch;opacity:.82;
+}
+.manifesto p.mf-body{max-width:62ch}
+@media(max-width:640px){
+  .mf-stack{letter-spacing:-.05em}
+  .mf-outline{-webkit-text-stroke-width:1.1px;text-stroke-width:1.1px}
+}
 .numbers{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border-block:1px solid var(--line)}
 .numbers div{background:var(--bg);padding:26px 20px;display:grid;gap:8px}
 .numbers strong{font-family:var(--display);font-variation-settings:'wdth' 125,'wght' 700;font-size:clamp(1.8rem,4vw,3rem);line-height:1}

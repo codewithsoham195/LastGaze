@@ -8,6 +8,9 @@ var LG_CONFIG = {
   keyId: "rzp_test_REPLACE_ME",   // Razorpay Dashboard -> Settings -> API Keys
   brand: "LASTGAZE",
   color: "#050505",
+  // WhatsApp number for "Reserve on WhatsApp" flow.
+  // Format: country code + number, no + or spaces. e.g. India = 91XXXXXXXXXX
+  whatsapp: "919999999999",
   // Where the signed order is created. See README step 4.
   orderEndpoint: ""               // e.g. "https://your-worker.workers.dev/order"
 };
