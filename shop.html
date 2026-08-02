@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shop all — LASTGAZE</title>
+<meta name="description" content="Every piece currently in the LASTGAZE archive. One of one.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#F0ECE6">
+<link rel="icon" href="assets/lastgaze-mark.svg">
+<script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('password.html')}catch(e){location.replace('password.html')}</script>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body class="paper">
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav">
+  <div class="nav-l">
+    <a href="index.html" aria-label="LASTGAZE home"><span class="mark" style="display:block"></span></a>
+    <a href="shop.html" class="lab">Shop</a>
+    <a href="index.html#manifesto" class="lab only-wide">Manifesto</a>
+  </div>
+  <div class="nav-r">
+    <a href="https://www.instagram.com/l4stgaze/" class="lab only-wide" target="_blank" rel="noopener">Instagram</a>
+    <button class="lab" data-cart-count>Bag</button>
+  </div>
+</nav>
+
+<header class="shop-head">
+  <div>
+    <h1 class="h-2">Shop all</h1>
+    <span class="lab dim">Drop 004 — nothing here restocks</span>
+  </div>
+  <div class="filters">
+    <button class="chip" data-filter="all" aria-pressed="true"><em>All</em></button>
+    <button class="chip" data-filter="outerwear" aria-pressed="false"><em>Outerwear</em></button>
+    <button class="chip" data-filter="knitwear" aria-pressed="false"><em>Knitwear</em></button>
+    <button class="chip" data-filter="denim" aria-pressed="false"><em>Denim</em></button>
+    <button class="chip" data-filter="tops" aria-pressed="false"><em>Tops</em></button>
+    <button class="chip" data-filter="trousers" aria-pressed="false"><em>Trousers</em></button>
+  </div>
+</header>
+
+<main class="grid" data-grid></main>
+
+<section class="wrap" style="padding-block:clamp(60px,9vw,120px);display:grid;gap:18px;justify-items:center;text-align:center">
+  <span class="lab dim">That's the whole archive</span>
+  <p class="h-2" style="max-width:18ch">Next eight land Saturday, 20:00 IST</p>
+  <a href="password.html" class="btn"><span>Early access</span><span class="arw">→</span></a>
+</section>
+
+<footer class="foot ink">
+  <div class="foot-top">
+    <div class="stack">
+      <span class="lab dim">Get told first</span>
+      <p class="lede" style="font-size:15px">One message, Saturday morning. Nothing else.</p>
+      <form class="pw" onsubmit="event.preventDefault();this.querySelector('input').value='';this.querySelector('button').textContent='Done'">
+        <input type="email" placeholder="Email" required aria-label="Email">
+        <button type="submit">Join</button>
+      </form>
+    </div>
+    <div>
+      <span class="lab dim">Shop</span>
+      <ul class="lab" style="margin-top:14px">
+        <li><a href="shop.html">All pieces</a></li>
+        <li><a href="index.html#drop">Next drop</a></li>
+        <li><a href="password.html">Early access</a></li>
+      </ul>
+    </div>
+    <div>
+      <span class="lab dim">Elsewhere</span>
+      <ul class="lab" style="margin-top:14px">
+        <li><a href="https://www.instagram.com/l4stgaze/" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a href="mailto:hello@lastgaze.com">hello@lastgaze.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <span class="wordmark" aria-hidden="true"></span>
+  <div class="foot-base lab dim"><span>© 2026 LASTGAZE</span><span>New Delhi, India</span></div>
+</footer>
+
+<script src="assets/products.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>
