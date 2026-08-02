@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only responsive sizing test of the manifesto section on /index.html and /lastgaze-site/index.html at 1920x1080, 1440x900, and 375x812 viewports. Verified the .mf-stack font-size clamp fix (clamp(2.4rem,9vw,8rem)). Desktop viewports now pass with no horizontal overflow; mobile 375 still overflows by ~5px.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": ".mf-stack / .mf-line (manifesto hero)",
+        "issue": "At 375px viewport (iPhone), all three manifesto lines overflow horizontally by ~5px. Measured getBoundingClientRect(): left=16, right=379.97, width=363.97 vs innerWidth=375 (documentElement.scrollWidth=380 → page has a horizontal scrollbar). Root cause: at 375px, 9vw=33.75px falls below the clamp minimum 2.4rem (38.4px), so the min clamp kicks in. Combined with the non-breaking space (\\xa0) in 'No\\xa0restocks.' the widest line cannot wrap and forces the block wider than the 343px content area (viewport 375 - 2*16px padding). Same behavior on both /index.html and /lastgaze-site/index.html.",
+        "selector": "[data-testid='manifesto-line-hunt'], [data-testid='manifesto-line-wear'], [data-testid='manifesto-line-norestocks']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Lower the clamp minimum for .mf-stack so it fits at 375px. Suggested value: font-size:clamp(1.9rem,9vw,8rem) (1.9rem=30.4px). Alternatively, tighten letter-spacing on the <=640px media query further (e.g., -.06em), or wrap the manifesto in a container that allows shrink-to-fit and add overflow-wrap. Also consider replacing the &nbsp; in 'No\\xa0restocks.' with a normal space on narrow viewports so the line can break if needed.",
+    "Verify at 360px and 320px viewports as well after the fix."
+  ],
+  "critical_code_review_comments": [
+    "Non-breaking space (\\xa0) inside manifesto lines prevents any wrap fallback; combined with a hard clamp minimum this guarantees overflow on very narrow viewports.",
+    ".mf-body max-width:62ch appears twice (line 287 and duplicated at line 289) — minor DRY nit."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "67% (4/6 viewport checks pass — both desktop widths pass on both pages; 375px fails on both)"},
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Server: python3 -m http.server 8765 from /app (already running). Test URLs: http://localhost:8765/index.html and http://localhost:8765/lastgaze-site/index.html. Set sessionStorage.lg_open='1' via add_init_script before goto (otherwise redirect to password.html). Measure overflow via page.evaluate on data-testid='manifesto-line-*' getBoundingClientRect().right vs window.innerWidth; also check document.documentElement.scrollWidth. Desktop 1440/1920 pass; retest 375 after main agent adjusts the clamp minimum or wraps.",
+  "rca of the issue": "At viewport 375px, 9vw=33.75px < clamp min 2.4rem (38.4px), so the min kicks in. 'No\\xa0restocks.' rendered at 38.4px italic condensed-wdth 125 weight 900 measures ~364px, wider than the 343px content area, and the non-breaking space (\\xa0) prevents wrapping. Result: 5px horizontal overflow, forcing a horizontal scrollbar (docScrollWidth=380 vs innerWidth=375). Middle line rendering (outlined, transparent fill, webkit-text-stroke 1.1px on mobile / 1.8px desktop) is correct. Descriptive paragraph text is correct on both pages."
+}
