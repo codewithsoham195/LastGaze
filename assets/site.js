@@ -126,35 +126,24 @@
 
   function card(p) {
     var state = p.sold ? 'sold' : (p.comingSoon ? 'preview' : '');
-    var tag = p.sold ? 'Gone' : (p.comingSoon ? 'Preview' : '1 of 1');
     return '' +
-      '<a class="card rise' + (state ? ' ' + state : '') + '" href="product.html?lot=' + p.lot + '" data-cat="' + p.cat + '">' +
-      '<span class="tagline lab">' + tag + '</span>' +
+      '<article class="card rise' + (state ? ' ' + state : '') + '">' +
+      '<a href="product.html?lot=' + p.lot + '" style="display:grid;gap:12px;color:inherit;text-decoration:none">' +
       frame(p, 0) +
-      '<div class="card-row"><h3>' + p.name + '</h3>' +
-      '<span class="price' + (p.sold ? ' strike' : '') + '">' + priceLabel(p) + '</span></div>' +
-      '<div class="card-row lab dim"><span>' + p.era + '</span><span>' + (p.size ? 'Size ' + p.size : 'Details pending') + '</span></div>' +
-      '</a>';
+      '<div class="card-row"><h3>' + p.name + '</h3><span class="price' + (p.sold ? ' strike' : '') + '">' + priceLabel(p) + '</span></div>' +
+      '<div class="lab dim">' + (p.era || 'Archive preview') + '</div>' +
+      '</a></article>';
   }
 
   function renderGrid() {
     var g = document.querySelector('[data-grid]');
     if (!g) return;
-    var all = window.LASTGAZE_PRODUCTS || [];
-    var limit = parseInt(g.dataset.limit || '0', 10);
-    var list = limit ? all.slice(0, limit) : all;
+    var list = window.LASTGAZE_PRODUCTS || [];
     g.innerHTML = list.map(card).join('');
 
-    document.querySelectorAll('.chip').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        document.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
-        btn.setAttribute('aria-pressed', 'true');
-        var c = btn.dataset.filter;
-        g.querySelectorAll('.card').forEach(function (el) {
-          el.style.display = (c === 'all' || el.dataset.cat === c) ? '' : 'none';
-        });
-      });
-    });
+    var count = document.querySelector('[data-product-count]');
+    if (count) count.textContent = String(list.length);
+
     reveals();
   }
 

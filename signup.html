@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sign Up — LASTGAZE</title>
+  <meta name="description" content="Sign up for LASTGAZE updates. Be the first to know about new vintage drops and archive finds.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#000">
+  <link rel="icon" href="assets/lastgaze-mark.svg">
+  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body class="ink pg">
+
+  <header class="pg-header">
+    <a href="index.html" class="pg-close" aria-label="Back to home">×</a>
+    <a href="index.html" class="pg-brand" aria-label="LASTGAZE home">
+      <img src="brand/lastgaze-wordmark-white.png?v=2" alt="LASTGAZE">
+    </a>
+    <div class="pg-header-right"></div>
+  </header>
+
+  <main class="pg-main" style="display:flex;align-items:center;min-height:calc(100vh - 60px);">
+    <div style="width:100%">
+      <h1 class="pg-h1">Sign Up for Updates</h1>
+
+      <div class="pg-signup-wrap">
+        <p class="pg-intro">
+          Be the first to know about new vintage drops, rare archive finds,
+          limited collections and exclusive releases.
+        </p>
+        <p class="pg-note">
+          Subscribe to receive occasional emails about new arrivals and updates.
+          You can unsubscribe at any time. Please review our
+          <a href="privacy.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">Privacy Policy</a>
+          for details.
+        </p>
+
+        <form class="pg-form" id="signup-form" novalidate>
+          <input type="email" id="signup-email" placeholder="Enter your email" required aria-label="Email address">
+          <button type="submit" aria-label="Subscribe">→</button>
+        </form>
+        <p class="pg-form-msg" id="signup-msg" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var form = document.getElementById('signup-form');
+      var msg  = document.getElementById('signup-msg');
+      if (!form) return;
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = document.getElementById('signup-email').value.trim();
+        if (!email || !email.includes('@')) {
+          msg.textContent = 'Please enter a valid email.';
+          return;
+        }
+        form.querySelector('input').value = '';
+        msg.textContent = 'You\'re in. We\'ll be in touch.';
+        form.querySelector('button').disabled = true;
+      });
+    })();
+  </script>
+
+</body>
+</html>

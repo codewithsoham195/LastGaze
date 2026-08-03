@@ -1,85 +1,453 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Shop all — LASTGAZE</title>
-<meta name="description" content="Every piece currently in the LASTGAZE archive. One of one.">
-<meta name="robots" content="noindex,nofollow,noarchive">
-<meta name="theme-color" content="#F0ECE6">
-<link rel="icon" href="assets/lastgaze-mark.svg">
-<script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('password.html')}catch(e){location.replace('password.html')}</script>
-<link rel="stylesheet" href="assets/site.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LASTGAZE — Shop all</title>
+  <meta name="description" content="LASTGAZE shop archive. Empty for now — upload your products later.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="assets/lastgaze-mark.svg">
+  <script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('password.html')}catch(e){location.replace('password.html')}</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 13px; }
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #000;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; }
+    button, select, input { font: inherit; }
+    ul { list-style: none; }
+
+    .announce {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 9px 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      padding: 0 20px;
+      height: 54px;
+      border-bottom: 1px solid #e8e8e8;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 100;
+    }
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+    .header-left { justify-content: flex-start; }
+    .header-right { justify-content: flex-end; gap: 20px; }
+    .header-menu, .header-right a {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 0;
+    }
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      justify-self: center;
+    }
+    .header-logo img {
+      display: block;
+      width: auto;
+      height: 18px;
+    }
+    .cart-count { display: inline-flex; align-items: center; }
+    .cart-count sup {
+      font-size: 9px;
+      font-weight: 700;
+      margin-left: 1px;
+      vertical-align: super;
+    }
+
+    .cat-nav {
+      border-bottom: 1px solid #e8e8e8;
+      padding: 0 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-nav ul {
+      display: flex;
+      gap: 0;
+      white-space: nowrap;
+    }
+    .cat-nav ul li a {
+      display: inline-block;
+      padding: 12px 13px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #888;
+      transition: color 0.15s;
+    }
+    .cat-nav ul li a:hover { color: #000; }
+    .cat-nav ul li a.active { color: #000; border-bottom: 2px solid #000; }
+
+    .shop-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .shop-count {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .shop-count span {
+      font-size: 9px;
+      vertical-align: super;
+      font-weight: 600;
+    }
+    .sort-filter-btn {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      color: #000;
+      position: relative;
+    }
+    .sort-filter-btn:hover { text-decoration: underline; }
+
+    .filter-panel {
+      display: none;
+      position: absolute;
+      right: 20px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      padding: 18px 20px;
+      z-index: 200;
+      min-width: 220px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+    }
+    .filter-panel.open { display: block; }
+    .filter-panel h4 {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 10px;
+      margin-top: 14px;
+    }
+    .filter-panel h4:first-child { margin-top: 0; }
+    .filter-panel label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 0;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+    .filter-panel select {
+      width: 100%;
+      padding: 7px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #ccc;
+      appearance: none;
+      cursor: pointer;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23000'/%3E%3C/svg%3E") no-repeat right 10px center;
+      background-size: 8px;
+      background-color: #fff;
+    }
+    .filter-close {
+      float: right;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      color: #999;
+    }
+    .filter-close:hover { color: #000; }
+
+    .products-section {
+      padding: 0;
+    }
+    .product-grid {
+      min-height: 56vh;
+      display: grid;
+      place-items: center;
+      padding: 40px 20px 64px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .empty-state {
+      max-width: 480px;
+      text-align: center;
+      display: grid;
+      gap: 10px;
+      padding: 36px 24px;
+      border: 1px solid #e8e8e8;
+      background: #fafafa;
+    }
+    .empty-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .empty-copy {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    footer {
+      background: #000;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+    .footer-col h5 {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+    .footer-col ul li { margin-bottom: 8px; }
+    .footer-col ul li a {
+      font-size: 11px;
+      color: #aaa;
+      letter-spacing: 0.03em;
+      transition: color 0.15s;
+    }
+    .footer-col ul li a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #333;
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-bottom p {
+      font-size: 10.5px;
+      color: #666;
+      letter-spacing: 0.04em;
+    }
+    .footer-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-logo img {
+      display: block;
+      width: auto;
+      height: 16px;
+    }
+
+    .signup-popup {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: #000;
+      color: #fff;
+      padding: 14px 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity 0.3s;
+    }
+    .signup-popup .popup-close {
+      font-size: 15px;
+      font-weight: 300;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+    .signup-popup .popup-close:hover { opacity: 1; }
+
+    @media (max-width: 900px) {
+      .footer-top { grid-template-columns: repeat(2, 1fr); }
+      .header-right a.hide-mobile { display: none; }
+    }
+    @media (max-width: 540px) {
+      header { padding: 0 12px; }
+      .cat-nav { padding: 0 8px; }
+      .shop-toolbar { padding: 8px 12px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
-<body class="paper">
-<div class="grain" aria-hidden="true"></div>
-
-<nav class="nav">
-  <div class="nav-l">
-    <a href="index.html" aria-label="LASTGAZE home"><span class="mark" style="display:block"></span></a>
-    <a href="shop.html" class="lab">Shop</a>
-    <a href="index.html#manifesto" class="lab only-wide">Manifesto</a>
-  </div>
-  <div class="nav-r">
-    <a href="https://www.instagram.com/l4stgaze/" class="lab only-wide" target="_blank" rel="noopener">Instagram</a>
-    <button class="lab" data-cart-count>Bag</button>
-  </div>
-</nav>
-
-<header class="shop-head">
-  <div>
-    <h1 class="h-2">Shop all</h1>
-    <span class="lab dim">Drop 004 — nothing here restocks</span>
-  </div>
-  <div class="filters">
-    <button class="chip" data-filter="all" aria-pressed="true"><em>All</em></button>
-    <button class="chip" data-filter="outerwear" aria-pressed="false"><em>Outerwear</em></button>
-    <button class="chip" data-filter="knitwear" aria-pressed="false"><em>Knitwear</em></button>
-    <button class="chip" data-filter="denim" aria-pressed="false"><em>Denim</em></button>
-    <button class="chip" data-filter="tops" aria-pressed="false"><em>Tops</em></button>
-    <button class="chip" data-filter="trousers" aria-pressed="false"><em>Trousers</em></button>
-  </div>
-</header>
-
-<main class="grid" data-grid></main>
-
-<section class="wrap" style="padding-block:clamp(60px,9vw,120px);display:grid;gap:18px;justify-items:center;text-align:center">
-  <span class="lab dim">That's the whole archive</span>
-  <p class="h-2" style="max-width:18ch">Next eight land Saturday, 20:00 IST</p>
-  <a href="password.html" class="btn"><span>Early access</span><span class="arw">→</span></a>
-</section>
-
-<footer class="foot ink">
-  <div class="foot-top">
-    <div class="stack">
-      <span class="lab dim">Get told first</span>
-      <p class="lede" style="font-size:15px">One message, Saturday morning. Nothing else.</p>
-      <form class="pw" onsubmit="event.preventDefault();this.querySelector('input').value='';this.querySelector('button').textContent='Done'">
-        <input type="email" placeholder="Email" required aria-label="Email">
-        <button type="submit">Join</button>
-      </form>
+<body>
+  <header>
+    <div class="header-left">
+      <span class="header-menu">Menu</span>
     </div>
-    <div>
-      <span class="lab dim">Shop</span>
-      <ul class="lab" style="margin-top:14px">
-        <li><a href="shop.html">All pieces</a></li>
-        <li><a href="index.html#drop">Next drop</a></li>
-        <li><a href="password.html">Early access</a></li>
-      </ul>
+    <a href="index.html" class="header-logo" aria-label="LASTGAZE home">
+      <img src="brand/lastgaze-wordmark-black.png" alt="LASTGAZE">
+    </a>
+    <div class="header-right">
+      <a href="#" class="hide-mobile">Search</a>
+      <a href="#" class="hide-mobile">Stores</a>
+      <a href="#">Account</a>
+      <a href="#" class="cart-count">Cart<sup>0</sup></a>
     </div>
-    <div>
-      <span class="lab dim">Elsewhere</span>
-      <ul class="lab" style="margin-top:14px">
-        <li><a href="https://www.instagram.com/l4stgaze/" target="_blank" rel="noopener">Instagram</a></li>
-        <li><a href="mailto:hello@lastgaze.com">hello@lastgaze.com</a></li>
-      </ul>
+  </header>
+
+  <nav class="cat-nav">
+    <ul>
+      <li><a href="#" data-cat="sale">Sale</a></li>
+      <li><a href="#" data-cat="new">New</a></li>
+      <li><a href="#" data-cat="denim">Denim</a></li>
+      <li><a href="#" data-cat="sweats">Sweats</a></li>
+      <li><a href="#" data-cat="tees">Tees</a></li>
+      <li><a href="#" data-cat="headwear">Headwear</a></li>
+      <li><a href="#" data-cat="tops">Tops</a></li>
+      <li><a href="#" data-cat="shorts">Shorts</a></li>
+      <li><a href="#" data-cat="pants">Pants</a></li>
+      <li><a href="#" data-cat="outerwear">Outerwear</a></li>
+      <li><a href="#" data-cat="accessories">Accessories</a></li>
+      <li><a href="#" data-cat="bags">Bags</a></li>
+      <li><a href="#" data-cat="all" class="active">All</a></li>
+    </ul>
+  </nav>
+
+  <div class="shop-toolbar">
+    <div class="shop-count">Shop<span id="productCount">0</span></div>
+    <div style="position:relative;">
+      <button class="sort-filter-btn" id="sortFilterBtn">Sort and Filter</button>
+      <div class="filter-panel" id="filterPanel">
+        <span class="filter-close" id="filterClose">×</span>
+        <h4>Sort By</h4>
+        <select id="sortSelect">
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="newest">Newest</option>
+          <option value="sale">On Sale</option>
+        </select>
+        <h4>Filter: Category</h4>
+        <label><input type="checkbox" name="cat" value="tees"> Tees</label>
+        <label><input type="checkbox" name="cat" value="sweats"> Sweats</label>
+        <label><input type="checkbox" name="cat" value="outerwear"> Outerwear</label>
+        <label><input type="checkbox" name="cat" value="pants"> Pants</label>
+        <label><input type="checkbox" name="cat" value="accessories"> Accessories</label>
+        <h4>Filter: Availability</h4>
+        <label><input type="checkbox" name="avail" value="sale"> On Sale</label>
+        <label><input type="checkbox" name="avail" value="instock"> In Stock</label>
+      </div>
     </div>
   </div>
-  <span class="wordmark" aria-hidden="true"></span>
-  <div class="foot-base lab dim"><span>© 2026 LASTGAZE</span><span>New Delhi, India</span></div>
-</footer>
 
-<script src="assets/products.js"></script>
-<script src="assets/site.js"></script>
+  <main class="products-section">
+    <div class="product-grid" id="productGrid">
+      <div class="empty-state">
+        <p class="empty-title">No products yet</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-top">
+      <div class="footer-col">
+        <h5>Shop</h5>
+        <ul>
+          <li><a href="shop.html">All pieces</a></li>
+          <li><a href="#">New arrivals</a></li>
+          <li><a href="#">Best sellers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="index.html">Our story</a></li>
+          <li><a href="#">Shipping</a></li>
+          <li><a href="#">Sizing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <ul>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="https://www.instagram.com/l4stgaze/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="mailto:hello@lastgaze.com">Email</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 LASTGAZE — New Delhi, India</p>
+      <div class="footer-logo">
+        <img src="brand/lastgaze-wordmark-white.png" alt="LASTGAZE">
+      </div>
+    </div>
+  </footer>
+
+  <div class="signup-popup" id="signupPopup">
+    <span>Get early access</span>
+    <span class="popup-close" id="popupClose">×</span>
+  </div>
+
+  <script>
+    const btn = document.getElementById('sortFilterBtn');
+    const panel = document.getElementById('filterPanel');
+    const close = document.getElementById('filterClose');
+    const popup = document.getElementById('signupPopup');
+    const popupClose = document.getElementById('popupClose');
+
+    btn.addEventListener('click', () => panel.classList.toggle('open'));
+    close.addEventListener('click', () => panel.classList.remove('open'));
+    popupClose.addEventListener('click', () => popup.style.opacity = '0');
+    document.addEventListener('click', (event) => {
+      if (!panel.contains(event.target) && !btn.contains(event.target)) panel.classList.remove('open');
+    });
+
+    document.querySelectorAll('.cat-nav a').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        document.querySelectorAll('.cat-nav a').forEach((item) => item.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
