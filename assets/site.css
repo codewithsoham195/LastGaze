@@ -172,6 +172,7 @@ button {
     justify-content: space-between;
     gap: 16px;
     padding: 14px var(--gut);
+    padding-inline-start: clamp(16px, 2vw, 32px);
     mix-blend-mode: difference;
     color: #fff;
     transition: transform .5s var(--ease);
