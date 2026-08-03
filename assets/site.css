@@ -575,7 +575,6 @@ body.menu-open {
     height: auto;
     object-fit: contain;
     filter: none;
-    image-rendering: crisp-edges;
     transform: translateZ(0);
 }
 
