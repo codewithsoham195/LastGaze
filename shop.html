@@ -223,6 +223,66 @@
       line-height: 1.6;
     }
 
+    .product-grid.has-items {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: #e8e8e8;
+      padding: 0;
+      min-height: 0;
+      place-items: initial;
+    }
+    @media (min-width: 700px) {
+      .product-grid.has-items { grid-template-columns: repeat(4, 1fr); }
+    }
+    .product-card {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 14px 20px;
+      gap: 8px;
+      color: inherit;
+    }
+    .product-card .frame {
+      aspect-ratio: 3 / 4;
+      background: #f4f4f4;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .product-card .frame img { width: 100%; height: 100%; object-fit: cover; }
+    .product-card .frame.empty {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 12px;
+      font-size: 10.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #999;
+      line-height: 1.6;
+    }
+    .product-card .p-lab {
+      font-size: 10px;
+      color: #999;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .product-card h3 {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .product-card .p-price {
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .product-card.sold .p-price { text-decoration: line-through; color: #999; font-weight: 500; }
+    .product-card.preview .p-price { color: #999; font-weight: 500; }
+    .product-card.sold .frame img,
+    .product-card.preview .frame img { opacity: 0.55; }
+
     footer {
       background: #000;
       color: #fff;
@@ -427,6 +487,7 @@
     <span class="popup-close" id="popupClose">×</span>
   </div>
 
+  <script src="assets/products.js"></script>
   <script>
     const btn = document.getElementById('sortFilterBtn');
     const panel = document.getElementById('filterPanel');
@@ -441,13 +502,93 @@
       if (!panel.contains(event.target) && !btn.contains(event.target)) panel.classList.remove('open');
     });
 
+    /* ---- product grid ---- */
+    const grid = document.getElementById('productGrid');
+    const countEl = document.getElementById('productCount');
+    const all = window.LASTGAZE_PRODUCTS || [];
+    let activeCat = 'all';
+    let checkedCats = [];
+    let wantSale = false;
+    let wantInStock = false;
+    let sortValue = 'featured';
+
+    function priceLabel(p) {
+      if (p.comingSoon || p.price == null) return 'Coming soon';
+      return '₹' + p.price.toLocaleString('en-IN');
+    }
+
+    function frameHTML(p) {
+      const src = p.image || (p.images && p.images.find(Boolean)) || '';
+      if (src) return '<div class="frame"><img src="' + src + '" alt="' + p.name.replace(/"/g, '&quot;') + '" loading="lazy" decoding="async"></div>';
+      return '<div class="frame empty">Lot ' + p.lot + '<br>Image pending</div>';
+    }
+
+    function cardHTML(p) {
+      const state = p.sold ? ' sold' : (p.comingSoon ? ' preview' : '');
+      return '<a class="product-card' + state + '" href="product.html?lot=' + p.lot + '">' +
+        frameHTML(p) +
+        '<div class="p-lab">' + (p.era || 'Archive') + '</div>' +
+        '<h3>' + p.name + '</h3>' +
+        '<div class="p-price">' + (p.sold ? 'Sold' : priceLabel(p)) + '</div>' +
+        '</a>';
+    }
+
+    function matches(p) {
+      if (activeCat === 'sale') return !!p.sale;
+      if (activeCat === 'new') return !!p.comingSoon;
+      if (activeCat !== 'all' && p.cat !== activeCat) return false;
+      if (checkedCats.length && !checkedCats.includes(p.cat)) return false;
+      if (wantSale && !p.sale) return false;
+      if (wantInStock && p.sold) return false;
+      return true;
+    }
+
+    function sortList(list) {
+      const out = list.slice();
+      if (sortValue === 'price-asc') out.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+      else if (sortValue === 'price-desc') out.sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
+      else if (sortValue === 'newest') out.sort((a, b) => b.lot.localeCompare(a.lot));
+      return out;
+    }
+
+    function render() {
+      const list = sortList(all.filter(matches));
+      countEl.textContent = String(list.length);
+      if (!list.length) {
+        grid.className = 'product-grid';
+        grid.innerHTML = '<div class="empty-state"><p class="empty-title">No pieces match</p><p class="empty-copy">Try a different filter.</p></div>';
+        return;
+      }
+      grid.className = 'product-grid has-items';
+      grid.innerHTML = list.map(cardHTML).join('');
+    }
+
     document.querySelectorAll('.cat-nav a').forEach((link) => {
       link.addEventListener('click', (event) => {
         event.preventDefault();
         document.querySelectorAll('.cat-nav a').forEach((item) => item.classList.remove('active'));
         link.classList.add('active');
+        activeCat = link.getAttribute('data-cat');
+        render();
       });
     });
+
+    document.querySelectorAll('input[name="cat"]').forEach((box) => {
+      box.addEventListener('change', () => {
+        checkedCats = Array.from(document.querySelectorAll('input[name="cat"]:checked')).map((b) => b.value);
+        render();
+      });
+    });
+
+    const saleBox = document.querySelector('input[name="avail"][value="sale"]');
+    const stockBox = document.querySelector('input[name="avail"][value="instock"]');
+    if (saleBox) saleBox.addEventListener('change', () => { wantSale = saleBox.checked; render(); });
+    if (stockBox) stockBox.addEventListener('change', () => { wantInStock = stockBox.checked; render(); });
+
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) sortSelect.addEventListener('change', () => { sortValue = sortSelect.value; render(); });
+
+    render();
   </script>
 </body>
 </html>
