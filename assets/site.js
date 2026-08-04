@@ -173,15 +173,16 @@
       '<div class="price" style="font-size:18px">' + priceLabel(p) + '</div>' +
       '</div>' +
       '<div class="pdp-secondary">' +
-      '<p class="lede" style="font-size:15px">' + p.condition + '</p>' +
       sizeControl +
       '<button class="btn solid" data-buy' + (unavailable ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '>' +
       '<span>' + (p.sold ? 'Gone' : (p.comingSoon ? 'Details coming soon' : 'Add to bag')) + '</span></button>' +
+      '<details class="acc"><summary><span class="lab">Description</span><span class="pm">+</span></summary>' +
+      '<div class="bd">' + p.condition + '</div></details>' +
       '<details class="acc"><summary><span class="lab">Measurements</span><span class="pm">+</span></summary>' +
       '<div class="bd">' + p.measure + '</div></details>' +
       '<details class="acc"><summary><span class="lab">Shipping &amp; returns</span><span class="pm">+</span></summary>' +
-      '<div class="bd">Dispatched from New Delhi within 48 hours. India 3–5 days, tracked. Worldwide 7–12 days, tracked. ' +
-      'Every piece is one of one, so all sales are final unless the item arrives damaged — message us within 48 hours of delivery and we will make it right.</div></details>' +
+      '<div class="bd">Dispatched from New Delhi within 48 hours. Shipping across India takes 3–5 days, fully tracked. ' +
+      'As every piece is a one-of-one, all sales are final — but please reach out within 48 hours of delivery if there\'s an issue, and we\'ll make it right.</div></details>' +
       '<details class="acc"><summary><span class="lab">On this piece</span><span class="pm">+</span></summary>' +
       '<div class="bd">Sourced, washed, measured and photographed by hand. Nothing is restored beyond cleaning. What you see is what has survived.</div></details>' +
       '</div>';
