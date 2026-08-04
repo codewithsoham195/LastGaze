@@ -6,10 +6,26 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>LASTGAZE — One of one. Once a week.</title>
     <meta name="description" content="LASTGAZE is a vintage menswear archive out of New Delhi. Eight pieces. Every Saturday. Nothing restocks.">
+    <meta name="robots" content="noindex,nofollow,noarchive">
     <meta property="og:title" content="LASTGAZE">
     <meta property="og:description" content="One of one. Once a week. Nothing restocks.">
     <meta name="theme-color" content="#050505">
     <link rel="icon" href="assets/lastgaze-mark.svg">
+    <script>
+        (function() {
+            try {
+                var host = location.hostname || '';
+                var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]';
+                if (isLocal) {
+                    sessionStorage.setItem('lg_open', '1');
+                } else if (sessionStorage.getItem('lg_open') !== '1') {
+                    location.replace('/password/');
+                }
+            } catch (e) {
+                location.replace('/password/');
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="assets/site.css">
     <link rel="stylesheet" href="css/menu-overlay.css">
 </head>
