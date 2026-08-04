@@ -7,8 +7,8 @@
   <meta name="description" content="LASTGAZE shop archive. Empty for now — upload your products later.">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="theme-color" content="#ffffff">
-  <link rel="icon" href="assets/lastgaze-mark.svg">
-  <script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('password.html')}catch(e){location.replace('password.html')}</script>
+  <link rel="icon" href="/assets/lastgaze-mark.svg">
+  <script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('/password/')}catch(e){location.replace('/password/')}</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 13px; }
@@ -400,12 +400,12 @@
     <div class="header-left">
       <span class="header-menu">Menu</span>
     </div>
-    <a href="index.html" class="header-logo" aria-label="LASTGAZE home">
-      <img src="brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
+    <a href="/" class="header-logo" aria-label="LASTGAZE home">
+      <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
     </a>
     <div class="header-right">
       <a href="#" class="hide-mobile">Search</a>
-      <a href="account.html">Account</a>
+      <a href="/account/">Account</a>
     </div>
   </header>
 
@@ -440,7 +440,7 @@
       <div class="footer-col">
         <h5>Shop</h5>
         <ul>
-          <li><a href="shop.html">All pieces</a></li>
+          <li><a href="/shop/">All pieces</a></li>
           <li><a href="#">New arrivals</a></li>
           <li><a href="#">Best sellers</a></li>
         </ul>
@@ -448,7 +448,7 @@
       <div class="footer-col">
         <h5>About</h5>
         <ul>
-          <li><a href="index.html">Our story</a></li>
+          <li><a href="/">Our story</a></li>
           <li><a href="#">Shipping</a></li>
           <li><a href="#">Sizing</a></li>
         </ul>
@@ -472,12 +472,12 @@
     <div class="footer-bottom">
       <p>© 2026 LASTGAZE — New Delhi, India</p>
       <div class="footer-logo">
-        <img src="brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+        <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
       </div>
     </div>
   </footer>
 
-  <script src="assets/products.js"></script>
+  <script src="/assets/products.js"></script>
   <script>
     /* ---- product grid ---- */
     const grid = document.getElementById('productGrid');
@@ -506,7 +506,7 @@
 
     function cardHTML(p) {
       const state = p.sold ? ' sold' : (p.comingSoon ? ' preview' : '');
-      return '<a class="product-card' + state + '" href="product.html?lot=' + p.lot + '">' +
+      return '<a class="product-card' + state + '" href="/product/?lot=' + p.lot + '">' +
         frameHTML(p) +
         '<div class="p-lab">' + (p.era || 'Archive') + '</div>' +
         '<h3>' + p.name + '</h3>' +

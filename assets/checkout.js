@@ -31,7 +31,7 @@ window.LG_PAY = function (cart) {
       notes: { lots: lots },
       handler: function (res) {
         try { sessionStorage.removeItem('lg_cart'); } catch (e) { }
-        location.href = "index.html?paid=" + res.razorpay_payment_id;
+        location.href = "/?paid=" + res.razorpay_payment_id;
       }
     });
     rz.open();

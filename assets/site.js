@@ -128,7 +128,7 @@
     var state = p.sold ? 'sold' : (p.comingSoon ? 'preview' : '');
     return '' +
       '<article class="card rise' + (state ? ' ' + state : '') + '">' +
-      '<a href="product.html?lot=' + p.lot + '" style="display:grid;gap:12px;color:inherit;text-decoration:none">' +
+      '<a href="/product/?lot=' + p.lot + '" style="display:grid;gap:12px;color:inherit;text-decoration:none">' +
       frame(p, 0) +
       '<div class="card-row"><h3>' + p.name + '</h3><span class="price' + (p.sold ? ' strike' : '') + '">' + priceLabel(p) + '</span></div>' +
       '<div class="lab dim">' + (p.era || 'Archive preview') + '</div>' +
@@ -232,7 +232,7 @@
       var status = document.querySelector('[data-lock-status]');
       if (v === String(window.LASTGAZE_DROP.password).toLowerCase()) {
         try { sessionStorage.setItem('lg_open', '1'); } catch (er) { }
-        location.href = 'index.html';
+        location.href = '/';
       } else {
         input.setAttribute('aria-invalid', 'true');
         if (status) status.textContent = 'That access code is not recognised.';
