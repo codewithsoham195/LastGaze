@@ -1,0 +1,6 @@
+name = "lastgaze-order-worker"
+main = "order-worker.js"
+compatibility_date = "2024-01-01"
+
+# Secrets are set via the Cloudflare dashboard or `wrangler secret put` —
+# never write RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET into this file.
