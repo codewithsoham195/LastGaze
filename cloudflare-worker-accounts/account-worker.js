@@ -22,8 +22,7 @@ function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Content-Type": "application/json"
   };
 }
@@ -65,18 +64,15 @@ function isValidEmail(email) {
   return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function parseCookie(request, name) {
-  const cookie = request.headers.get("Cookie") || "";
-  const match = cookie.match(new RegExp("(?:^|; )" + name + "=([^;]+)"));
-  return match ? decodeURIComponent(match[1]) : null;
-}
-
-function sessionCookie(token, maxAgeSeconds) {
-  return `lg_session=${token}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${maxAgeSeconds}`;
-}
-
-function clearSessionCookie() {
-  return "lg_session=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0";
+// The session token travels as an Authorization header, not a cookie —
+// a cookie set by this *.workers.dev origin while the page is on
+// lastgaze.com is a third-party cookie, which Chrome and Safari block by
+// default for a growing share of visitors. A bearer token isn't subject
+// to that restriction at all.
+function bearerToken(request) {
+  const auth = request.headers.get("Authorization") || "";
+  const match = auth.match(/^Bearer\s+(.+)$/i);
+  return match ? match[1] : null;
 }
 
 async function createSession(db, userId) {
@@ -89,7 +85,7 @@ async function createSession(db, userId) {
 }
 
 async function getSessionUser(db, request) {
-  const token = parseCookie(request, "lg_session");
+  const token = bearerToken(request);
   if (!token) return null;
   const tokenHash = await sha256Hex(token);
   const row = await db.prepare(
@@ -131,8 +127,7 @@ export default {
         ).bind(userId, email, hash, salt, fullName).run();
 
         const token = await createSession(db, userId);
-        headers["Set-Cookie"] = sessionCookie(token, SESSION_DAYS * 86400);
-        return json({ ok: true, user: { id: userId, email, full_name: fullName } }, 200, headers);
+        return json({ ok: true, token, user: { id: userId, email, full_name: fullName } }, 200, headers);
       }
 
       if (url.pathname === "/auth/login" && request.method === "POST") {
@@ -150,17 +145,15 @@ export default {
         if (hash !== user.password_hash) return json({ error: "Invalid email or password" }, 401, headers);
 
         const token = await createSession(db, user.id);
-        headers["Set-Cookie"] = sessionCookie(token, SESSION_DAYS * 86400);
-        return json({ ok: true, user: { id: user.id, email: user.email, full_name: user.full_name } }, 200, headers);
+        return json({ ok: true, token, user: { id: user.id, email: user.email, full_name: user.full_name } }, 200, headers);
       }
 
       if (url.pathname === "/auth/logout" && request.method === "POST") {
-        const token = parseCookie(request, "lg_session");
+        const token = bearerToken(request);
         if (token) {
           const tokenHash = await sha256Hex(token);
           await db.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(tokenHash).run();
         }
-        headers["Set-Cookie"] = clearSessionCookie();
         return json({ ok: true }, 200, headers);
       }
 

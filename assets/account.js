@@ -1,8 +1,10 @@
 /* ============================================================
    LASTGAZE — account
    Drives account.html: sign in / sign up / address book.
-   Talks to the account worker over fetch with credentials
-   included so the session cookie round-trips.
+   Talks to the account worker over fetch, authenticating with a
+   bearer token (not a cookie) since the worker lives on a
+   different origin — a cookie set there would be a third-party
+   cookie, which Chrome/Safari block by default for many visitors.
    ============================================================ */
 
 var LG_ACCOUNT_CONFIG = {
@@ -11,11 +13,27 @@ var LG_ACCOUNT_CONFIG = {
 };
 
 (function () {
+  var TOKEN_KEY = 'lg_session_token';
+
+  function getToken() {
+    return localStorage.getItem(TOKEN_KEY) || '';
+  }
+
+  function setToken(token) {
+    localStorage.setItem(TOKEN_KEY, token);
+  }
+
+  function clearToken() {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+
   function api(path, options) {
     options = options || {};
     var opts = {
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getToken()
+      }
     };
     for (var k in options) opts[k] = options[k];
     return fetch(LG_ACCOUNT_CONFIG.apiBase.replace(/\/$/, '') + path, opts).then(function (res) {
@@ -80,6 +98,7 @@ var LG_ACCOUNT_CONFIG = {
         password: document.getElementById('signin-password').value
       })
     }).then(function (data) {
+      setToken(data.token);
       showAccount(data.user);
     }).catch(function (err) {
       signinMsg.textContent = err.message;
@@ -97,6 +116,7 @@ var LG_ACCOUNT_CONFIG = {
         password: document.getElementById('signup-account-password').value
       })
     }).then(function (data) {
+      setToken(data.token);
       showAccount(data.user);
     }).catch(function (err) {
       signupMsg.textContent = err.message;
@@ -105,6 +125,7 @@ var LG_ACCOUNT_CONFIG = {
 
   signoutBtn.addEventListener('click', function () {
     api('/auth/logout', { method: 'POST' }).then(function () {
+      clearToken();
       showAuth();
     });
   });
@@ -213,9 +234,14 @@ var LG_ACCOUNT_CONFIG = {
   });
 
   // Check for an existing session on load.
-  api('/account/me', { method: 'GET' }).then(function (data) {
-    showAccount(data.user);
-  }).catch(function () {
+  if (getToken()) {
+    api('/account/me', { method: 'GET' }).then(function (data) {
+      showAccount(data.user);
+    }).catch(function () {
+      clearToken();
+      showAuth();
+    });
+  } else {
     showAuth();
-  });
+  }
 })();
