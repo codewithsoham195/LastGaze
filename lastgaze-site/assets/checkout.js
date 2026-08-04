@@ -5,11 +5,11 @@
    ============================================================ */
 
 var LG_CONFIG = {
-  keyId: "rzp_test_TLZWBLYkdD36bR",   // Razorpay Dashboard -> Settings -> API Keys
+  keyId: "rzp_live_TLclBaju3VOqER",   // Razorpay Dashboard -> Settings -> API Keys
   brand: "LASTGAZE",
   color: "#050505",
   // Where the signed order is created. See README step 4.
-  orderEndpoint: ""               // e.g. "https://your-worker.workers.dev/order"
+  orderEndpoint: "https://lastgaze-order-worker.l4stgaze.workers.dev/"
 };
 
 window.LG_PAY = function (cart) {
