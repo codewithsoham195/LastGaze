@@ -31,7 +31,16 @@ window.LG_PAY = function (cart) {
       notes: { lots: lots },
       handler: function (res) {
         try { sessionStorage.removeItem('lg_cart'); } catch (e) { }
-        location.href = "/?paid=" + res.razorpay_payment_id;
+        var redirect = function () { location.href = "/?paid=" + res.razorpay_payment_id; };
+        if (!LG_CONFIG.orderEndpoint) return redirect();
+        // Tell the worker to independently verify this payment with
+        // Razorpay and mark the lot(s) sold — best-effort, never blocks
+        // the buyer's success redirect if it fails.
+        fetch(LG_CONFIG.orderEndpoint.replace(/\/$/, '') + '/confirm-payment', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ payment_id: res.razorpay_payment_id })
+        }).then(redirect).catch(redirect);
       }
     });
     rz.open();

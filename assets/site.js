@@ -124,6 +124,18 @@
     return '<div class="frame empty"><div class="slot-note lab">Lot ' + p.lot + '<br>Image pending</div></div>';
   }
 
+  // Lots the order worker has independently confirmed as paid —
+  // overrides products.js's static `sold` flag so a piece greys out
+  // the moment it's actually bought, not whenever someone next edits
+  // that file by hand.
+  var SOLD_LOTS_ENDPOINT = 'https://lastgaze-order-worker.l4stgaze.workers.dev/sold-lots';
+  function fetchSoldLots() {
+    return fetch(SOLD_LOTS_ENDPOINT)
+      .then(function (r) { return r.json(); })
+      .then(function (d) { return Array.isArray(d.lots) ? d.lots : []; })
+      .catch(function () { return []; });
+  }
+
   function card(p) {
     var state = p.sold ? 'sold' : (p.comingSoon ? 'preview' : '');
     return '' +
@@ -139,12 +151,15 @@
     var g = document.querySelector('[data-grid]');
     if (!g) return;
     var list = window.LASTGAZE_PRODUCTS || [];
-    g.innerHTML = list.map(card).join('');
+    fetchSoldLots().then(function (soldLots) {
+      list.forEach(function (p) { if (soldLots.indexOf(p.lot) !== -1) p.sold = true; });
+      g.innerHTML = list.map(card).join('');
 
-    var count = document.querySelector('[data-product-count]');
-    if (count) count.textContent = String(list.length);
+      var count = document.querySelector('[data-product-count]');
+      if (count) count.textContent = String(list.length);
 
-    reveals();
+      reveals();
+    });
   }
 
   /* ---------- 6. product page ------------------------------------ */
@@ -156,6 +171,13 @@
     var p = all.filter(function (x) { return x.lot === lot; })[0] || all[0];
     if (!p) return;
 
+    fetchSoldLots().then(function (soldLots) {
+      if (soldLots.indexOf(p.lot) !== -1) p.sold = true;
+      renderPDPContent(p, root);
+    });
+  }
+
+  function renderPDPContent(p, root) {
     document.title = p.name + ' — LASTGAZE';
     var galleryImages = (p.images || []).filter(Boolean);
     if (!galleryImages.length) galleryImages = p.image ? [p.image] : [''];

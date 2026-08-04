@@ -549,7 +549,17 @@
       });
     });
 
-    render();
+    // Lots the order worker has independently confirmed as paid —
+    // overrides products.js's static `sold` flag so a piece greys
+    // out the moment it's actually bought.
+    fetch('https://lastgaze-order-worker.l4stgaze.workers.dev/sold-lots')
+      .then((r) => r.json())
+      .then((d) => (Array.isArray(d.lots) ? d.lots : []))
+      .catch(() => [])
+      .then((soldLots) => {
+        all.forEach((p) => { if (soldLots.includes(p.lot)) p.sold = true; });
+        render();
+      });
   </script>
 </body>
 </html>
