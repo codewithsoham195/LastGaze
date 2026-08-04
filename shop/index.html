@@ -236,19 +236,25 @@
       .product-grid.has-items { grid-template-columns: repeat(4, 1fr); }
     }
     .product-card {
+      display: block;
+      color: inherit;
+      position: relative;
+    }
+    .product-card:hover {
+      z-index: 2;
+    }
+    .product-card-inner {
       background: #fff;
       display: flex;
       flex-direction: column;
+      height: 100%;
       padding: 14px 14px 20px;
       gap: 8px;
-      color: inherit;
-      position: relative;
       transition: transform 0.35s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.35s ease;
     }
-    .product-card:hover {
+    .product-card:hover .product-card-inner {
       transform: translateY(-6px);
       box-shadow: 0 20px 34px rgba(0, 0, 0, 0.16);
-      z-index: 2;
     }
     .product-card .frame {
       aspect-ratio: 3 / 4;
@@ -507,11 +513,12 @@
     function cardHTML(p) {
       const state = p.sold ? ' sold' : (p.comingSoon ? ' preview' : '');
       return '<a class="product-card' + state + '" href="/product/?lot=' + p.lot + '">' +
+        '<div class="product-card-inner">' +
         frameHTML(p) +
         '<div class="p-lab">' + (p.era || 'Archive') + '</div>' +
         '<h3>' + p.name + '</h3>' +
         '<div class="p-price">' + (p.sold ? 'Sold' : priceLabel(p)) + '</div>' +
-        '</a>';
+        '</div></a>';
     }
 
     function matches(p) {
