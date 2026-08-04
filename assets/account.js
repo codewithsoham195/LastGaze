@@ -1,0 +1,221 @@
+/* ============================================================
+   LASTGAZE — account
+   Drives account.html: sign in / sign up / address book.
+   Talks to the account worker over fetch with credentials
+   included so the session cookie round-trips.
+   ============================================================ */
+
+var LG_ACCOUNT_CONFIG = {
+  // Deployed account-worker URL. See cloudflare-worker-accounts/README.md.
+  apiBase: "https://lastgaze-account-worker.l4stgaze.workers.dev"
+};
+
+(function () {
+  function api(path, options) {
+    options = options || {};
+    var opts = {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    };
+    for (var k in options) opts[k] = options[k];
+    return fetch(LG_ACCOUNT_CONFIG.apiBase.replace(/\/$/, '') + path, opts).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok) throw new Error(data.error || 'Something went wrong');
+        return data;
+      });
+    });
+  }
+
+  var authView = document.getElementById('auth-view');
+  if (!authView) return; // not on the account page
+
+  var accountView = document.getElementById('account-view');
+  var tabs = document.querySelectorAll('.pg-tab');
+  var signinForm = document.getElementById('signin-form');
+  var signupForm = document.getElementById('signup-account-form');
+  var signinMsg = document.getElementById('signin-msg');
+  var signupMsg = document.getElementById('signup-account-msg');
+  var accountEmail = document.getElementById('account-email');
+  var signoutBtn = document.getElementById('signout-btn');
+  var addressList = document.getElementById('address-list');
+  var addAddressBtn = document.getElementById('add-address-btn');
+  var addressForm = document.getElementById('address-form');
+  var addressMsg = document.getElementById('address-msg');
+  var addressCancel = document.getElementById('address-cancel');
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('is-active'); });
+      tab.classList.add('is-active');
+      var isSignup = tab.dataset.tab === 'signup';
+      signinForm.style.display = isSignup ? 'none' : 'block';
+      signupForm.style.display = isSignup ? 'block' : 'none';
+    });
+  });
+
+  if (!LG_ACCOUNT_CONFIG.apiBase) {
+    signinMsg.textContent = 'Account service is not configured yet.';
+    return;
+  }
+
+  function showAccount(user) {
+    authView.style.display = 'none';
+    accountView.style.display = 'block';
+    accountEmail.textContent = user.email;
+    loadAddresses();
+  }
+
+  function showAuth() {
+    accountView.style.display = 'none';
+    authView.style.display = 'block';
+  }
+
+  signinForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    signinMsg.textContent = '';
+    api('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: document.getElementById('signin-email').value.trim(),
+        password: document.getElementById('signin-password').value
+      })
+    }).then(function (data) {
+      showAccount(data.user);
+    }).catch(function (err) {
+      signinMsg.textContent = err.message;
+    });
+  });
+
+  signupForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    signupMsg.textContent = '';
+    api('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({
+        full_name: document.getElementById('signup-name').value.trim(),
+        email: document.getElementById('signup-account-email').value.trim(),
+        password: document.getElementById('signup-account-password').value
+      })
+    }).then(function (data) {
+      showAccount(data.user);
+    }).catch(function (err) {
+      signupMsg.textContent = err.message;
+    });
+  });
+
+  signoutBtn.addEventListener('click', function () {
+    api('/auth/logout', { method: 'POST' }).then(function () {
+      showAuth();
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : str;
+    return div.innerHTML;
+  }
+
+  function renderAddresses(addresses) {
+    if (!addresses.length) {
+      addressList.innerHTML = '<p class="pg-form-msg" style="margin:0 0 20px;">No saved addresses yet.</p>';
+      return;
+    }
+    addressList.innerHTML = addresses.map(function (a) {
+      return '' +
+        '<div class="pg-address-card" data-id="' + a.id + '">' +
+          '<div class="pg-address-card__top">' +
+            '<span class="pg-address-card__label">' + escapeHtml(a.label || 'Address') + '</span>' +
+            (a.is_default ? '<span class="pg-address-card__default">Default</span>' : '') +
+          '</div>' +
+          '<div class="pg-address-card__body">' +
+            escapeHtml(a.full_name) + '<br>' +
+            escapeHtml(a.line1) + (a.line2 ? ', ' + escapeHtml(a.line2) : '') + '<br>' +
+            escapeHtml(a.city) + ', ' + escapeHtml(a.state) + ' ' + escapeHtml(a.postal_code) + '<br>' +
+            escapeHtml(a.country) + (a.phone ? ' · ' + escapeHtml(a.phone) : '') +
+          '</div>' +
+          '<div class="pg-address-card__actions">' +
+            '<button type="button" class="pg-link-btn" data-edit="' + a.id + '">Edit</button>' +
+            '<button type="button" class="pg-link-btn" data-delete="' + a.id + '">Delete</button>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+
+    addressList.querySelectorAll('[data-edit]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var address = addresses.filter(function (a) { return a.id === btn.dataset.edit; })[0];
+        if (address) openAddressForm(address);
+      });
+    });
+    addressList.querySelectorAll('[data-delete]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (!confirm('Delete this address?')) return;
+        api('/account/addresses/' + btn.dataset.delete, { method: 'DELETE' }).then(loadAddresses);
+      });
+    });
+  }
+
+  function loadAddresses() {
+    api('/account/addresses', { method: 'GET' }).then(function (data) {
+      renderAddresses(data.addresses || []);
+    });
+  }
+
+  function openAddressForm(address) {
+    address = address || {};
+    document.getElementById('address-id').value = address.id || '';
+    document.getElementById('address-label').value = address.label || '';
+    document.getElementById('address-full-name').value = address.full_name || '';
+    document.getElementById('address-line1').value = address.line1 || '';
+    document.getElementById('address-line2').value = address.line2 || '';
+    document.getElementById('address-city').value = address.city || '';
+    document.getElementById('address-state').value = address.state || '';
+    document.getElementById('address-postal').value = address.postal_code || '';
+    document.getElementById('address-phone').value = address.phone || '';
+    document.getElementById('address-default').checked = !!address.is_default;
+    addressMsg.textContent = '';
+    addressForm.style.display = 'block';
+    addAddressBtn.style.display = 'none';
+    addressForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function closeAddressForm() {
+    addressForm.reset();
+    addressForm.style.display = 'none';
+    addAddressBtn.style.display = 'block';
+  }
+
+  addAddressBtn.addEventListener('click', function () { openAddressForm(); });
+  addressCancel.addEventListener('click', closeAddressForm);
+
+  addressForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var id = document.getElementById('address-id').value;
+    var payload = {
+      label: document.getElementById('address-label').value.trim(),
+      full_name: document.getElementById('address-full-name').value.trim(),
+      line1: document.getElementById('address-line1').value.trim(),
+      line2: document.getElementById('address-line2').value.trim(),
+      city: document.getElementById('address-city').value.trim(),
+      state: document.getElementById('address-state').value.trim(),
+      postal_code: document.getElementById('address-postal').value.trim(),
+      phone: document.getElementById('address-phone').value.trim(),
+      is_default: document.getElementById('address-default').checked
+    };
+    var request = id
+      ? api('/account/addresses/' + id, { method: 'PUT', body: JSON.stringify(payload) })
+      : api('/account/addresses', { method: 'POST', body: JSON.stringify(payload) });
+    request.then(function () {
+      closeAddressForm();
+      loadAddresses();
+    }).catch(function (err) {
+      addressMsg.textContent = err.message;
+    });
+  });
+
+  // Check for an existing session on load.
+  api('/account/me', { method: 'GET' }).then(function (data) {
+    showAccount(data.user);
+  }).catch(function () {
+    showAuth();
+  });
+})();

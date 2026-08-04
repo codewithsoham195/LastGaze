@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Account — LASTGAZE</title>
+  <meta name="description" content="Sign in to your LASTGAZE account to manage your saved addresses.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#000">
+  <link rel="icon" href="assets/lastgaze-mark.svg">
+  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body class="ink pg">
+
+  <header class="pg-header">
+    <a href="index.html" class="pg-close" aria-label="Back to home">×</a>
+    <a href="index.html" class="pg-brand" aria-label="LASTGAZE home">
+      <img src="brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+    </a>
+    <div class="pg-header-right"></div>
+  </header>
+
+  <main class="pg-main">
+
+    <div id="auth-view">
+      <h1 class="pg-h1">Account</h1>
+
+      <div class="pg-tabs">
+        <button type="button" class="pg-tab is-active" data-tab="signin">Sign In</button>
+        <button type="button" class="pg-tab" data-tab="signup">Create Account</button>
+      </div>
+
+      <form class="pg-fieldset" id="signin-form" novalidate>
+        <div class="pg-field">
+          <label class="pg-label" for="signin-email">Email</label>
+          <input class="pg-input" type="email" id="signin-email" required autocomplete="email">
+        </div>
+        <div class="pg-field">
+          <label class="pg-label" for="signin-password">Password</label>
+          <input class="pg-input" type="password" id="signin-password" required autocomplete="current-password">
+        </div>
+        <button class="pg-btn" type="submit">Sign In</button>
+        <p class="pg-form-msg" id="signin-msg" role="status" aria-live="polite"></p>
+      </form>
+
+      <form class="pg-fieldset" id="signup-account-form" novalidate style="display:none">
+        <div class="pg-field">
+          <label class="pg-label" for="signup-name">Full name</label>
+          <input class="pg-input" type="text" id="signup-name" required autocomplete="name">
+        </div>
+        <div class="pg-field">
+          <label class="pg-label" for="signup-account-email">Email</label>
+          <input class="pg-input" type="email" id="signup-account-email" required autocomplete="email">
+        </div>
+        <div class="pg-field">
+          <label class="pg-label" for="signup-account-password">Password (min. 8 characters)</label>
+          <input class="pg-input" type="password" id="signup-account-password" required minlength="8" autocomplete="new-password">
+        </div>
+        <button class="pg-btn" type="submit">Create Account</button>
+        <p class="pg-form-msg" id="signup-account-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div id="account-view" style="display:none">
+      <div class="pg-account-header">
+        <span class="pg-account-email" id="account-email"></span>
+        <button class="pg-link-btn" type="button" id="signout-btn">Sign Out</button>
+      </div>
+
+      <h2 class="pg-h2" style="text-align:center;margin-bottom:24px;">Saved Addresses</h2>
+      <div class="pg-address-list" id="address-list"></div>
+
+      <div style="text-align:center;margin-bottom:40px;">
+        <button class="pg-btn pg-btn--ghost" type="button" id="add-address-btn" style="max-width:260px;margin:0 auto;">Add Address</button>
+      </div>
+
+      <form class="pg-fieldset" id="address-form" novalidate style="display:none">
+        <input type="hidden" id="address-id">
+        <div class="pg-field">
+          <label class="pg-label" for="address-label">Label (e.g. Home)</label>
+          <input class="pg-input" type="text" id="address-label">
+        </div>
+        <div class="pg-field">
+          <label class="pg-label" for="address-full-name">Full name</label>
+          <input class="pg-input" type="text" id="address-full-name" required>
+        </div>
+        <div class="pg-field">
+          <label class="pg-label" for="address-line1">Address line 1</label>
+          <input class="pg-input" type="text" id="address-line1" required>
+        </div>
+        <div class="pg-field">
+          <label class="pg-label" for="address-line2">Address line 2</label>
+          <input class="pg-input" type="text" id="address-line2">
+        </div>
+        <div class="pg-row2">
+          <div class="pg-field">
+            <label class="pg-label" for="address-city">City</label>
+            <input class="pg-input" type="text" id="address-city" required>
+          </div>
+          <div class="pg-field">
+            <label class="pg-label" for="address-state">State</label>
+            <input class="pg-input" type="text" id="address-state" required>
+          </div>
+        </div>
+        <div class="pg-row2">
+          <div class="pg-field">
+            <label class="pg-label" for="address-postal">Postal code</label>
+            <input class="pg-input" type="text" id="address-postal" required>
+          </div>
+          <div class="pg-field">
+            <label class="pg-label" for="address-phone">Phone</label>
+            <input class="pg-input" type="tel" id="address-phone">
+          </div>
+        </div>
+        <div class="pg-field">
+          <label style="display:flex;align-items:center;gap:8px;font-family:var(--body);font-size:13px;color:rgba(255,255,255,.6);">
+            <input type="checkbox" id="address-default"> Set as default address
+          </label>
+        </div>
+        <button class="pg-btn" type="submit">Save Address</button>
+        <button class="pg-btn pg-btn--ghost" type="button" id="address-cancel" style="margin-top:10px;">Cancel</button>
+        <p class="pg-form-msg" id="address-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+  </main>
+
+  <script src="assets/account.js"></script>
+
+</body>
+</html>

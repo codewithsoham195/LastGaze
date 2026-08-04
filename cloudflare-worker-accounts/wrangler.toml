@@ -1,0 +1,10 @@
+name = "lastgaze-account-worker"
+main = "account-worker.js"
+compatibility_date = "2024-01-01"
+
+# Create the D1 database first (dashboard or `wrangler d1 create lastgaze`),
+# then replace database_id below with the id it gives you.
+[[d1_databases]]
+binding = "DB"
+database_name = "lastgaze"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
