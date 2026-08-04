@@ -1825,22 +1825,20 @@ body.menu-open {
 .pdp {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(32px, 6vw, 64px);
+    gap: clamp(28px, 5vw, 56px);
     padding-top: 76px
+}
+
+@media(min-width:860px) {
+    .pdp {
+        grid-template-columns: 1.3fr 1fr
+    }
 }
 
 .gallery {
     display: grid;
     gap: 14px;
-    max-width: 920px;
-    width: 100%;
-    margin-inline: auto
-}
-
-@media(min-width:640px) {
-    .gallery {
-        grid-template-columns: 1fr 1fr
-    }
+    width: 100%
 }
 
 .gallery .frame {
@@ -1859,9 +1857,7 @@ body.menu-open {
     display: grid;
     gap: 24px;
     padding-block: 10px;
-    max-width: 920px;
-    width: 100%;
-    margin-inline: auto
+    align-content: start
 }
 
 .pdp-primary {
@@ -1874,13 +1870,6 @@ body.menu-open {
     display: grid;
     gap: 22px;
     align-content: start
-}
-
-@media(min-width:640px) {
-    .pdp-info {
-        grid-template-columns: .85fr 1.15fr;
-        align-items: start
-    }
 }
 
 .pdp-info .btn.solid {
