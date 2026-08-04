@@ -6,7 +6,7 @@
    3. Save, push. Done.
 
    image: ""        -> renders an empty archive frame (no stock photo)
-   image: "img/x.jpg" -> renders your photo
+   image: "/img/x.jpg" -> renders your photo (must start with a slash)
    sold: true       -> greys the card, strikes the price
    comingSoon: true -> displays a preview without enabling checkout
    ============================================================ */
@@ -26,8 +26,8 @@ window.LASTGAZE_PRODUCTS = [
     price: 2000,
     size: "34",
     sold: false,
-    image: "img/products/hendrix-jns-01.jpg",
-    images: ["img/products/hendrix-jns-01.jpg", "img/products/hendrix-jns-02.jpg"],
+    image: "/img/products/hendrix-jns-01.jpg",
+    images: ["/img/products/hendrix-jns-01.jpg", "/img/products/hendrix-jns-02.jpg"],
     condition: "8.5/10 — naturally faded dark wash with heavy whiskering throughout. No major stains or tears; light signs of wear consistent with vintage/pre-owned denim. Frayed hems at the leg openings add to the worn-in look. Pockets, stitching, zipper, and button all intact and functional. Relaxed bootcut / straight-flare silhouette in washed black / charcoal blue.",
     measure: "Waist: 34\"<br>Outseam (Length): 42\"<br>Inseam: 32\"<br>Rise: 10.5\"<br>Leg Opening: 10\""
   }
