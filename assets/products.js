@@ -125,5 +125,18 @@ window.LASTGAZE_PRODUCTS = [
     images: ["", "", "", ""],
     condition: "Deep patina across the shoulders. Zip runs clean.",
     measure: "Chest 57cm · Length 62cm · Shoulder 49cm · Sleeve 64cm"
+  },
+  {
+    lot: "009",
+    name: "Hendrix JNS — Dark Wash Bootcut",
+    era: "Vintage denim",
+    cat: "denim",
+    price: 2000,
+    size: "34",
+    sold: false,
+    image: "",
+    images: ["", "", "", ""],
+    condition: "8.5/10 — naturally faded dark wash with heavy whiskering throughout. No major stains or tears; light signs of wear consistent with vintage/pre-owned denim. Frayed hems at the leg openings add to the worn-in look. Pockets, stitching, zipper, and button all intact and functional. Relaxed bootcut / straight-flare silhouette in washed black / charcoal blue.",
+    measure: "Waist 34in · Additional measurements coming soon"
   }
 ];
