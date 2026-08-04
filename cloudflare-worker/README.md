@@ -1,8 +1,14 @@
 # Order worker
 
 Creates a signed Razorpay order server-side so a buyer can't tamper with the
-price before paying. Deploy this once, then point `assets/checkout.js`'s
-`orderEndpoint` at the deployed URL.
+price before paying. Also verifies payment independently with Razorpay
+(never trusting the browser's own "it succeeded" callback) and records sold
+lots in D1, so `sold-lots` can grey out a piece on the shop/product pages the
+moment it's actually paid for — not whenever someone next edits
+`products.js` by hand.
+
+Deploy this once, then point `assets/checkout.js`'s `orderEndpoint` at the
+deployed URL.
 
 ## Deploy via the Cloudflare dashboard (no CLI needed)
 
@@ -15,8 +21,13 @@ price before paying. Deploy this once, then point `assets/checkout.js`'s
    - `RAZORPAY_KEY_ID` — your `rzp_live_...` key
    - `RAZORPAY_KEY_SECRET` — your key secret
    Add both as **Secret** (encrypted), not plain text. Save.
-5. Copy the worker's URL (`https://lastgaze-order-worker.<your-subdomain>.workers.dev`).
-6. Send that URL back — it goes into `orderEndpoint` in `assets/checkout.js`,
+5. **Bindings** → **Add binding** → **D1 database**. Variable name: `DB`.
+   Database: the same `lastgaze` D1 database the account worker uses (see
+   `cloudflare-worker-accounts/README.md` if you haven't created it yet).
+6. In that D1 database's **Console** tab, run `sold-lots-schema.sql` once
+   (only needed the first time).
+7. Copy the worker's URL (`https://lastgaze-order-worker.<your-subdomain>.workers.dev`).
+8. Send that URL back — it goes into `orderEndpoint` in `assets/checkout.js`,
    alongside switching `keyId` to the live key.
 
 ## Deploy via Wrangler CLI (alternative)

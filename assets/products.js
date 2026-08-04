@@ -30,5 +30,18 @@ window.LASTGAZE_PRODUCTS = [
     images: ["/img/products/hendrix-jns-01.jpg", "/img/products/hendrix-jns-02.jpg"],
     condition: "8.5/10 — naturally faded dark wash with heavy whiskering throughout. No major stains or tears; light signs of wear consistent with vintage/pre-owned denim. Frayed hems at the leg openings add to the worn-in look. Pockets, stitching, zipper, and button all intact and functional. Relaxed bootcut / straight-flare silhouette in washed black / charcoal blue.",
     measure: "Waist: 34\"<br>Outseam (Length): 42\"<br>Inseam: 32\"<br>Rise: 10.5\"<br>Leg Opening: 10\""
+  },
+  {
+    lot: "010",
+    name: "Urbanage Design Essentials — Grey Puffer Jacket",
+    era: "Winter outerwear",
+    cat: "outerwear",
+    price: 20000,
+    size: "L",
+    sold: false,
+    image: "/img/products/puffer-grey-01.jpg",
+    images: ["/img/products/puffer-grey-01.jpg", "/img/products/puffer-grey-02.jpg"],
+    condition: "9/10 — like-new condition with no visible stains, tears, or fading. Zipper, snap-button collar closure, and both hand pockets fully functional. Minimal signs of wear consistent with light or no prior use. Relaxed boxy silhouette in solid grey nylon with front zip closure and branded chest/back graphics.",
+    measure: "Chest: 24\"<br>Length: 27\"<br>Shoulder: 20\"<br>Sleeve: 25\""
   }
 ];
