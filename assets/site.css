@@ -6,7 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 :root {
     --ink: #050505;
-    --paper: #F0ECE6;
+    --paper: #FFFFFF;
     /* pulled from the logo file itself */
     --smoke: #8D8C8A;
     --fg: var(--paper);
@@ -1856,6 +1856,27 @@ body.menu-open {
     display: grid;
     gap: 22px;
     padding-block: 10px
+}
+
+.pdp-info .btn.solid {
+    width: 100%;
+    justify-content: center;
+    background: var(--fg);
+    padding: 18px 20px;
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-shadow: none;
+    text-transform: uppercase;
+}
+
+.pdp-info .btn.solid span {
+    color: var(--bg)
+}
+
+.pdp-info .btn.solid:hover {
+    color: var(--bg)
 }
 
 .sizes {
