@@ -250,8 +250,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
     .product-card .frame img { width: 100%; height: 100%; object-fit: cover; }
+    .product-card .frame.has-back img {
+      position: absolute;
+      inset: 0;
+      transition: opacity 0.35s ease;
+    }
+    .product-card .frame.has-back .img-back { opacity: 0; }
+    .product-card .frame.has-back:hover .img-front { opacity: 0; }
+    .product-card .frame.has-back:hover .img-back { opacity: 1; }
     .product-card .frame.empty {
       display: grid;
       place-items: center;
@@ -518,9 +527,18 @@
     }
 
     function frameHTML(p) {
-      const src = p.image || (p.images && p.images.find(Boolean)) || '';
-      if (src) return '<div class="frame"><img src="' + src + '" alt="' + p.name.replace(/"/g, '&quot;') + '" loading="lazy" decoding="async"></div>';
-      return '<div class="frame empty">Lot ' + p.lot + '<br>Image pending</div>';
+      const gallery = (p.images || []).filter(Boolean);
+      const front = p.image || gallery[0] || '';
+      const back = gallery.find((src) => src && src !== front) || '';
+      const alt = p.name.replace(/"/g, '&quot;');
+      if (!front) return '<div class="frame empty">Lot ' + p.lot + '<br>Image pending</div>';
+      if (back) {
+        return '<div class="frame has-back">' +
+          '<img class="img-front" src="' + front + '" alt="' + alt + '" loading="lazy" decoding="async">' +
+          '<img class="img-back" src="' + back + '" alt="' + alt + ' — back" loading="lazy" decoding="async">' +
+          '</div>';
+      }
+      return '<div class="frame"><img src="' + front + '" alt="' + alt + '" loading="lazy" decoding="async"></div>';
     }
 
     function cardHTML(p) {
