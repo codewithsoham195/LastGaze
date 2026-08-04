@@ -5,7 +5,7 @@
    ============================================================ */
 
 var LG_CONFIG = {
-  keyId: "rzp_test_REPLACE_ME",   // Razorpay Dashboard -> Settings -> API Keys
+  keyId: "rzp_test_TLZWBLYkdD36bR",   // Razorpay Dashboard -> Settings -> API Keys
   brand: "LASTGAZE",
   color: "#050505",
   // WhatsApp number for "Reserve on WhatsApp" flow.
