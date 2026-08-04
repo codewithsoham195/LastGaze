@@ -28,8 +28,15 @@ body.pg {
   z-index: 100;
 }
 
-.pg-close {
+.pg-header-left {
   justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pg-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -41,9 +48,19 @@ body.pg {
   text-decoration: none;
   opacity: .6;
   transition: opacity .2s;
+  flex-shrink: 0;
 }
 
 .pg-close:hover { opacity: 1; }
+
+.pg-header-email {
+  font-family: var(--body);
+  font-size: 12px;
+  color: rgba(255,255,255,.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .pg-brand {
   justify-self: center;
@@ -383,20 +400,6 @@ body.pg {
   background: transparent;
   border: 1px solid rgba(255,255,255,.28);
   color: #fff;
-}
-
-.pg-account-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  max-width: 640px;
-  margin: 0 auto 40px;
-}
-
-.pg-account-email {
-  font-family: var(--body);
-  color: rgba(255,255,255,.6);
-  font-size: 14px;
 }
 
 .pg-link-btn {

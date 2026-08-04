@@ -80,12 +80,16 @@ var LG_ACCOUNT_CONFIG = {
     authView.style.display = 'none';
     accountView.style.display = 'block';
     accountEmail.textContent = user.email;
+    accountEmail.style.display = 'inline';
+    signoutBtn.style.display = 'inline';
     loadAddresses();
   }
 
   function showAuth() {
     accountView.style.display = 'none';
     authView.style.display = 'block';
+    accountEmail.style.display = 'none';
+    signoutBtn.style.display = 'none';
   }
 
   signinForm.addEventListener('submit', function (e) {

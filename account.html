@@ -14,11 +14,16 @@
 <body class="ink pg">
 
   <header class="pg-header">
-    <a href="index.html" class="pg-close" aria-label="Back to home">×</a>
+    <div class="pg-header-left">
+      <a href="index.html" class="pg-close" aria-label="Back to home">×</a>
+      <span class="pg-header-email" id="account-email" style="display:none"></span>
+    </div>
     <a href="index.html" class="pg-brand" aria-label="LASTGAZE home">
       <img src="brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
     </a>
-    <div class="pg-header-right"></div>
+    <div class="pg-header-right">
+      <button type="button" class="pg-link-btn" id="signout-btn" style="display:none">Sign Out</button>
+    </div>
   </header>
 
   <main class="pg-main">
@@ -63,11 +68,6 @@
     </div>
 
     <div id="account-view" style="display:none">
-      <div class="pg-account-header">
-        <span class="pg-account-email" id="account-email"></span>
-        <button class="pg-link-btn" type="button" id="signout-btn">Sign Out</button>
-      </div>
-
       <h2 class="pg-h2" style="text-align:center;margin-bottom:24px;">Saved Addresses</h2>
       <div class="pg-address-list" id="address-list"></div>
 
