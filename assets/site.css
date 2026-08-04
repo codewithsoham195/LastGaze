@@ -1607,7 +1607,7 @@ body.menu-open {
     z-index: 2;
     min-height: 100svh;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: 1fr auto;
     gap: 26px;
     padding: clamp(20px, 3vw, 48px) var(--gut) 24px;
     isolation: isolate;
@@ -1763,7 +1763,6 @@ body.menu-open {
     position: relative;
     z-index: 2;
     padding-top: 15px;
-    border-top: 1px solid var(--line);
     font-size: 10px;
     letter-spacing: .16em
 }
