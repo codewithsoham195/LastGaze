@@ -405,9 +405,7 @@
     </a>
     <div class="header-right">
       <a href="#" class="hide-mobile">Search</a>
-      <a href="#" class="hide-mobile">Stores</a>
       <a href="#">Account</a>
-      <a href="#" class="cart-count">Cart<sup>0</sup></a>
     </div>
   </header>
 
@@ -428,33 +426,6 @@
       <li><a href="#" data-cat="all" class="active">All</a></li>
     </ul>
   </nav>
-
-  <div class="shop-toolbar">
-    <div class="shop-count">Shop<span id="productCount">0</span></div>
-    <div style="position:relative;">
-      <button class="sort-filter-btn" id="sortFilterBtn">Sort and Filter</button>
-      <div class="filter-panel" id="filterPanel">
-        <span class="filter-close" id="filterClose">×</span>
-        <h4>Sort By</h4>
-        <select id="sortSelect">
-          <option value="featured">Featured</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="newest">Newest</option>
-          <option value="sale">On Sale</option>
-        </select>
-        <h4>Filter: Category</h4>
-        <label><input type="checkbox" name="cat" value="tees"> Tees</label>
-        <label><input type="checkbox" name="cat" value="sweats"> Sweats</label>
-        <label><input type="checkbox" name="cat" value="outerwear"> Outerwear</label>
-        <label><input type="checkbox" name="cat" value="pants"> Pants</label>
-        <label><input type="checkbox" name="cat" value="accessories"> Accessories</label>
-        <h4>Filter: Availability</h4>
-        <label><input type="checkbox" name="avail" value="sale"> On Sale</label>
-        <label><input type="checkbox" name="avail" value="instock"> In Stock</label>
-      </div>
-    </div>
-  </div>
 
   <main class="products-section">
     <div class="product-grid" id="productGrid">
@@ -506,35 +477,12 @@
     </div>
   </footer>
 
-  <div class="signup-popup" id="signupPopup">
-    <span>Get early access</span>
-    <span class="popup-close" id="popupClose">×</span>
-  </div>
-
   <script src="assets/products.js"></script>
   <script>
-    const btn = document.getElementById('sortFilterBtn');
-    const panel = document.getElementById('filterPanel');
-    const close = document.getElementById('filterClose');
-    const popup = document.getElementById('signupPopup');
-    const popupClose = document.getElementById('popupClose');
-
-    btn.addEventListener('click', () => panel.classList.toggle('open'));
-    close.addEventListener('click', () => panel.classList.remove('open'));
-    popupClose.addEventListener('click', () => popup.style.opacity = '0');
-    document.addEventListener('click', (event) => {
-      if (!panel.contains(event.target) && !btn.contains(event.target)) panel.classList.remove('open');
-    });
-
     /* ---- product grid ---- */
     const grid = document.getElementById('productGrid');
-    const countEl = document.getElementById('productCount');
     const all = window.LASTGAZE_PRODUCTS || [];
     let activeCat = 'all';
-    let checkedCats = [];
-    let wantSale = false;
-    let wantInStock = false;
-    let sortValue = 'featured';
 
     function priceLabel(p) {
       if (p.comingSoon || p.price == null) return 'Coming soon';
@@ -570,23 +518,11 @@
       if (activeCat === 'sale') return !!p.sale;
       if (activeCat === 'new') return !!p.comingSoon;
       if (activeCat !== 'all' && p.cat !== activeCat) return false;
-      if (checkedCats.length && !checkedCats.includes(p.cat)) return false;
-      if (wantSale && !p.sale) return false;
-      if (wantInStock && p.sold) return false;
       return true;
     }
 
-    function sortList(list) {
-      const out = list.slice();
-      if (sortValue === 'price-asc') out.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
-      else if (sortValue === 'price-desc') out.sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
-      else if (sortValue === 'newest') out.sort((a, b) => b.lot.localeCompare(a.lot));
-      return out;
-    }
-
     function render() {
-      const list = sortList(all.filter(matches));
-      countEl.textContent = String(list.length);
+      const list = all.filter(matches);
       if (!list.length) {
         grid.className = 'product-grid';
         grid.innerHTML = '<div class="empty-state"><p class="empty-title">No pieces match</p><p class="empty-copy">Try a different filter.</p></div>';
@@ -605,21 +541,6 @@
         render();
       });
     });
-
-    document.querySelectorAll('input[name="cat"]').forEach((box) => {
-      box.addEventListener('change', () => {
-        checkedCats = Array.from(document.querySelectorAll('input[name="cat"]:checked')).map((b) => b.value);
-        render();
-      });
-    });
-
-    const saleBox = document.querySelector('input[name="avail"][value="sale"]');
-    const stockBox = document.querySelector('input[name="avail"][value="instock"]');
-    if (saleBox) saleBox.addEventListener('change', () => { wantSale = saleBox.checked; render(); });
-    if (stockBox) stockBox.addEventListener('change', () => { wantInStock = stockBox.checked; render(); });
-
-    const sortSelect = document.getElementById('sortSelect');
-    if (sortSelect) sortSelect.addEventListener('change', () => { sortValue = sortSelect.value; render(); });
 
     render();
   </script>
