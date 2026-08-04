@@ -12,7 +12,7 @@
 // assets/products.js — this worker never trusts a price sent
 // by the browser.
 const PRICES = {
-  "009": 1
+  "009": 2000
 };
 
 const ALLOWED_ORIGINS = [

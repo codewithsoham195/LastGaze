@@ -23,7 +23,7 @@ window.LASTGAZE_PRODUCTS = [
     name: "Hendrix JNS — Dark Wash Bootcut",
     era: "Vintage denim",
     cat: "denim",
-    price: 1,
+    price: 2000,
     size: "34",
     sold: false,
     image: "img/products/hendrix-jns-01.jpg",
