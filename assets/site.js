@@ -167,9 +167,12 @@
       ? '<div><div class="lab dim" style="margin-bottom:8px">Size — one piece only</div><div class="sizes"><button class="size lab" aria-pressed="true">' + p.size + '</button></div></div>'
       : '<div class="lab dim">Sizing details coming soon</div>';
     info.innerHTML = '' +
+      '<div class="pdp-primary">' +
       '<div class="lab dim">Lot ' + p.lot + ' · ' + p.era + '</div>' +
       '<h1 class="h-1">' + p.name + '</h1>' +
       '<div class="price" style="font-size:18px">' + priceLabel(p) + '</div>' +
+      '</div>' +
+      '<div class="pdp-secondary">' +
       '<p class="lede" style="font-size:15px">' + p.condition + '</p>' +
       sizeControl +
       '<button class="btn solid" data-buy' + (unavailable ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '>' +
@@ -180,7 +183,8 @@
       '<div class="bd">Dispatched from New Delhi within 48 hours. India 3–5 days, tracked. Worldwide 7–12 days, tracked. ' +
       'Every piece is one of one, so all sales are final unless the item arrives damaged — message us within 48 hours of delivery and we will make it right.</div></details>' +
       '<details class="acc"><summary><span class="lab">On this piece</span><span class="pm">+</span></summary>' +
-      '<div class="bd">Sourced, washed, measured and photographed by hand. Nothing is restored beyond cleaning. What you see is what has survived.</div></details>';
+      '<div class="bd">Sourced, washed, measured and photographed by hand. Nothing is restored beyond cleaning. What you see is what has survived.</div></details>' +
+      '</div>';
 
     var buy = info.querySelector('[data-buy]');
     if (buy && !unavailable) {
