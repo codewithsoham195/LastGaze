@@ -40,21 +40,21 @@ function LG_SHIPPING_FORM(onSubmit, onCancel) {
   var inputHtml = fields.map(function (f) {
     var required = (f[0] !== 'email' && f[0] !== 'line2') ? ' required' : '';
     return '' +
-      '<label style="display:block;margin-bottom:12px;">' +
-      '<span style="display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(5,5,5,.55);margin-bottom:5px;">' + f[1] + '</span>' +
+      '<label style="display:block;margin-bottom:14px;">' +
+      '<span style="display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(240,236,230,.5);margin-bottom:6px;">' + f[1] + '</span>' +
       '<input name="' + f[0] + '" type="' + f[2] + '" autocomplete="' + f[3] + '"' + required +
-      ' style="width:100%;box-sizing:border-box;border:1px solid rgba(5,5,5,.25);background:#fff;color:#050505;font-size:15px;padding:10px 12px;outline:0;">' +
+      ' style="width:100%;box-sizing:border-box;border:0;border-bottom:1px solid rgba(240,236,230,.3);background:transparent;color:#F0ECE6;font-size:15px;padding:9px 0;outline:0;">' +
       '</label>';
   }).join('');
 
   overlay.innerHTML = '' +
-    '<div style="background:#F0ECE6;color:#050505;max-width:420px;width:100%;max-height:88vh;overflow:auto;padding:26px 24px;">' +
-    '<h2 style="margin:0 0 4px;font-size:18px;">Shipping details</h2>' +
-    '<p style="margin:0 0 18px;font-size:13px;color:rgba(5,5,5,.6);">Where should we send this?</p>' +
+    '<div style="background:#050505;color:#F0ECE6;max-width:420px;width:100%;max-height:88vh;overflow:auto;padding:26px 24px;">' +
+    '<h2 style="margin:0 0 4px;font-size:18px;color:#F0ECE6;">Shipping details</h2>' +
+    '<p style="margin:0 0 18px;font-size:13px;color:rgba(240,236,230,.55);">Where should we send this?</p>' +
     '<form data-lg-ship-form>' + inputHtml +
-    '<p data-lg-ship-err style="display:none;color:#a33;font-size:12px;margin:0 0 12px;"></p>' +
-    '<button type="submit" style="width:100%;background:#050505;color:#F0ECE6;border:0;padding:13px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Continue to payment</button>' +
-    '<button type="button" data-lg-ship-cancel style="width:100%;background:transparent;color:#050505;border:0;padding:10px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;opacity:.6;">Cancel</button>' +
+    '<p data-lg-ship-err style="display:none;color:#ff7a7a;font-size:12px;margin:0 0 12px;"></p>' +
+    '<button type="submit" style="width:100%;background:#F0ECE6;color:#050505;border:0;padding:13px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:6px;">Continue to payment</button>' +
+    '<button type="button" data-lg-ship-cancel style="width:100%;background:transparent;color:#F0ECE6;border:0;padding:10px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;opacity:.55;">Cancel</button>' +
     '</form></div>';
 
   document.body.appendChild(overlay);
