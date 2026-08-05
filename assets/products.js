@@ -43,5 +43,18 @@ window.LASTGAZE_PRODUCTS = [
     images: ["/img/products/puffer-grey-01.jpg", "/img/products/puffer-grey-02.jpg"],
     condition: "9/10 — like-new condition with no visible stains, tears, or fading. Zipper, snap-button collar closure, and both hand pockets fully functional. Minimal signs of wear consistent with light or no prior use. Relaxed boxy silhouette in solid grey nylon with front zip closure and branded chest/back graphics.",
     measure: "Chest: 24\"<br>Length: 27\"<br>Shoulder: 20\"<br>Sleeve: 25\""
+  },
+  {
+    lot: "011",
+    name: "STAY — Striped Long Sleeve Tee",
+    era: "Long sleeve tee",
+    cat: "tees",
+    price: 1500,
+    size: "L",
+    sold: false,
+    image: "/img/products/stay-striped-tee-01.jpg",
+    images: ["/img/products/stay-striped-tee-01.jpg"],
+    condition: "9.5/10 — like-new condition with no visible stains, tears, or fading. Crew neckline and cuffs fully intact. Minimal signs of wear consistent with light or no prior use. Relaxed silhouette in black and cream stripe with woven STAY neck label.",
+    measure: "Chest: 22\"<br>Length: 28\"<br>Shoulder: 19\"<br>Sleeve: 25\""
   }
 ];
