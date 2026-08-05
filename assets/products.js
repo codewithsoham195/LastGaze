@@ -62,15 +62,15 @@ window.LASTGAZE_PRODUCTS = [
   },
   {
     // TEMPORARY — checkout/admin test listing. Remove once verified.
-    lot: "998",
+    lot: "999",
     name: "Demo Jeans — DO NOT BUY",
     era: "Test listing",
     cat: "denim",
     price: 1,
     size: "M",
     sold: false,
-    image: "",
-    images: [],
+    image: "/img/products/demo-jeans-999-01.jpg",
+    images: ["/img/products/demo-jeans-999-01.jpg", "/img/products/demo-jeans-999-02.jpg"],
     condition: "This is a ₹1 test listing used to verify the checkout and admin order flow. Not a real product.",
     measure: "N/A"
   }
