@@ -192,15 +192,106 @@
   <script src="/assets/products.js"></script>
   <script>
     (function () {
+      // Same account worker assets/account.js talks to — used here to
+      // look up an order that isn't in this session's sessionStorage
+      // (e.g. clicking an older order from the account page's Orders
+      // tab, possibly in a different browser session).
+      var ACCOUNT_API_BASE = "https://lastgaze-account-worker.l4stgaze.workers.dev";
+
       function inr(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
       function escapeHtml(s) {
         return String(s || '').replace(/[&<>"']/g, function (c) {
           return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
         });
       }
+      function getSessionToken() {
+        try { return localStorage.getItem('lg_session_token') || ''; } catch (e) { return ''; }
+      }
 
       var params = new URLSearchParams(location.search);
       var paidId = params.get('paid') || '';
+
+      var products = window.LASTGAZE_PRODUCTS || [];
+      function findProduct(lot) {
+        return products.filter(function (p) { return p.lot === lot; })[0];
+      }
+
+      var foundEl = document.getElementById('ocFound');
+      var missingEl = document.getElementById('ocMissing');
+
+      function showMissing() {
+        foundEl.style.display = 'none';
+        missingEl.style.display = 'block';
+        document.getElementById('ocMissingPaymentId').textContent = paidId ? 'Payment reference: ' + paidId : '';
+      }
+
+      function renderOrder(order) {
+        document.getElementById('ocPaymentId').textContent = 'Order ref ' + (order.payment_id || paidId);
+        document.getElementById('ocDate').textContent = order.placed_at
+          ? new Date(order.placed_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+          : '';
+
+        var items = order.items || [];
+        document.getElementById('ocItems').innerHTML = items.map(function (item) {
+          var p = findProduct(item.lot) || {};
+          var img = p.image || (p.images && p.images[0]) || '';
+          var thumb = img
+            ? '<img src="' + img + '" alt="' + escapeHtml(item.name) + '">'
+            : '<div class="oc-item-frame-empty">Lot ' + escapeHtml(item.lot) + '</div>';
+          return '' +
+            '<div class="oc-item-card">' +
+            '<div class="oc-item-frame">' + thumb + '</div>' +
+            '<div>' +
+            '<div class="oc-item-name">' + escapeHtml(item.name) + '</div>' +
+            '<div class="oc-item-meta">Lot ' + escapeHtml(item.lot) + (item.size ? ' · Size ' + escapeHtml(item.size) : '') + '</div>' +
+            '</div>' +
+            '<div class="oc-item-price">' + (item.price != null ? inr(item.price) : '') + '</div>' +
+            '</div>';
+        }).join('');
+
+        document.getElementById('ocTotal').textContent = inr(order.amount);
+
+        var s = order.shipping || {};
+        var addrLines = [s.name, s.phone, s.email, s.line1, s.line2, [s.city, s.state, s.postal_code].filter(Boolean).join(', ')].filter(Boolean);
+        document.getElementById('ocAddress').innerHTML = addrLines.map(escapeHtml).join('<br>');
+      }
+
+      // Order rows fetched from the account worker only carry lot codes
+      // and a total (no per-item size/price breakdown) — unlike the
+      // sessionStorage snapshot saved right after checkout, which has
+      // the full cart. Build the same shape either way so renderOrder()
+      // doesn't need to care which source it came from.
+      function orderFromAccountRow(row) {
+        var lots = String(row.lots || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        return {
+          payment_id: row.payment_id,
+          amount: (row.amount || 0) / 100, // stored in paise; sessionStorage's copy is in rupees
+          placed_at: row.created_at,
+          shipping: {
+            name: row.name, phone: row.phone, email: row.email,
+            line1: row.line1, line2: row.line2, city: row.city, state: row.state, postal_code: row.postal_code
+          },
+          items: lots.map(function (lot) {
+            var p = findProduct(lot);
+            return { lot: lot, name: (p && p.name) || ('Lot ' + lot), size: null, price: null };
+          })
+        };
+      }
+
+      function tryLoadFromAccount() {
+        var token = getSessionToken();
+        if (!token || !paidId) return showMissing();
+        fetch(ACCOUNT_API_BASE.replace(/\/$/, '') + '/account/orders', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        })
+          .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+          .then(function (data) {
+            var row = (data.orders || []).filter(function (o) { return o.payment_id === paidId; })[0];
+            if (!row) return showMissing();
+            renderOrder(orderFromAccountRow(row));
+          })
+          .catch(showMissing);
+      }
 
       var order = null;
       try { order = JSON.parse(sessionStorage.getItem('lg_last_order') || 'null'); } catch (e) { }
@@ -210,49 +301,11 @@
       // session showing up if someone revisits an old confirmation link.
       if (order && paidId && order.payment_id !== paidId) order = null;
 
-      var foundEl = document.getElementById('ocFound');
-      var missingEl = document.getElementById('ocMissing');
-
-      if (!order) {
-        foundEl.style.display = 'none';
-        missingEl.style.display = 'block';
-        document.getElementById('ocMissingPaymentId').textContent = paidId ? 'Payment reference: ' + paidId : '';
-        return;
+      if (order) {
+        renderOrder(order);
+      } else {
+        tryLoadFromAccount();
       }
-
-      var products = window.LASTGAZE_PRODUCTS || [];
-      function findProduct(lot) {
-        return products.filter(function (p) { return p.lot === lot; })[0];
-      }
-
-      document.getElementById('ocPaymentId').textContent = 'Order ref ' + (order.payment_id || paidId);
-      document.getElementById('ocDate').textContent = order.placed_at
-        ? new Date(order.placed_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
-        : '';
-
-      var items = order.items || [];
-      document.getElementById('ocItems').innerHTML = items.map(function (item) {
-        var p = findProduct(item.lot) || {};
-        var img = p.image || (p.images && p.images[0]) || '';
-        var thumb = img
-          ? '<img src="' + img + '" alt="' + escapeHtml(item.name) + '">'
-          : '<div class="oc-item-frame-empty">Lot ' + escapeHtml(item.lot) + '</div>';
-        return '' +
-          '<div class="oc-item-card">' +
-          '<div class="oc-item-frame">' + thumb + '</div>' +
-          '<div>' +
-          '<div class="oc-item-name">' + escapeHtml(item.name) + '</div>' +
-          '<div class="oc-item-meta">Lot ' + escapeHtml(item.lot) + (item.size ? ' · Size ' + escapeHtml(item.size) : '') + '</div>' +
-          '</div>' +
-          '<div class="oc-item-price">' + inr(item.price) + '</div>' +
-          '</div>';
-      }).join('');
-
-      document.getElementById('ocTotal').textContent = inr(order.amount);
-
-      var s = order.shipping || {};
-      var addrLines = [s.name, s.phone, s.email, s.line1, s.line2, [s.city, s.state, s.postal_code].filter(Boolean).join(', ')].filter(Boolean);
-      document.getElementById('ocAddress').innerHTML = addrLines.map(escapeHtml).join('<br>');
     })();
   </script>
 </body>

@@ -201,14 +201,14 @@ var LG_ACCOUNT_CONFIG = {
         ? new Date(o.created_at.replace(' ', 'T') + 'Z').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
         : '';
       return '' +
-        '<div class="ord-card">' +
+        '<a class="ord-card" href="/order-confirmation/?paid=' + encodeURIComponent(o.payment_id || '') + '">' +
         '<div class="ord-card-top">' +
         '<span class="ord-date">' + escapeHtml(placed) + '</span>' +
         '<span class="ord-ref">' + escapeHtml(o.payment_id || '') + '</span>' +
         '</div>' +
         itemsHtml +
         '<div class="ord-total"><span>Total paid</span><strong>' + inr(o.amount) + '</strong></div>' +
-        '</div>';
+        '</a>';
     }).join('');
   }
 

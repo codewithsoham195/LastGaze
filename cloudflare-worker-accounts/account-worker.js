@@ -170,7 +170,8 @@ export default {
         // Reads the order worker's table directly — both workers share
         // this D1 database, so no service-to-service call is needed.
         const { results } = await db.prepare(
-          "SELECT payment_id, lots, amount, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC"
+          "SELECT payment_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code, created_at " +
+          "FROM orders WHERE user_id = ? ORDER BY created_at DESC"
         ).bind(me.id).all();
         return json({ orders: results }, 200, headers);
       }
