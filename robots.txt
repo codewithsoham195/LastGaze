@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Transactional / private — these carry noindex on-page as well
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /account/
+Disallow: /order-confirmation/
+
+# Parameter noise
+Disallow: /?sort=
+Disallow: /?q=
+
+# Never block rendering assets — Google needs these to render the page
+Allow: /assets/
+Allow: /css/
+Allow: /js/
+Allow: /brand/
+Allow: /img/
+
+User-agent: Googlebot-Image
+Allow: /
+
+Sitemap: https://lastgaze.com/sitemap.xml

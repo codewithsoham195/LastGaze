@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://lastgaze.com/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://lastgaze.com/shop/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://lastgaze.com/products/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://lastgaze.com/signup/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://lastgaze.com/sustainability/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://lastgaze.com/terms/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://lastgaze.com/privacy/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <url>
+    <loc>https://lastgaze.com/cookies/</loc>
+    <lastmod>2026-08-05</lastmod>
+  </url>
+  <!-- ADD AS YOU BUILD THEM — these are the pages that actually rank:
+  <url><loc>https://lastgaze.com/about/</loc><lastmod>2026-08-10</lastmod></url>
+  <url><loc>https://lastgaze.com/how-drops-work/</loc><lastmod>2026-08-10</lastmod></url>
+  <url><loc>https://lastgaze.com/archive/</loc><lastmod>2026-08-10</lastmod></url>
+  <url><loc>https://lastgaze.com/sizing/</loc><lastmod>2026-08-10</lastmod></url>
+  <url><loc>https://lastgaze.com/shipping-returns/</loc><lastmod>2026-08-10</lastmod></url>
+  <url><loc>https://lastgaze.com/collections/denim/</loc><lastmod>2026-08-10</lastmod></url>
+  <url><loc>https://lastgaze.com/collections/outerwear/</loc><lastmod>2026-08-10</lastmod></url>
+  -->
+  <!-- DO NOT ADD: /account/, /cart/, /checkout/ -->
+</urlset>

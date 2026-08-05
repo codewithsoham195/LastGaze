@@ -6,26 +6,47 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>LASTGAZE — One of one. Once a week.</title>
     <meta name="description" content="LASTGAZE is a vintage menswear archive out of New Delhi. Eight pieces. Every Saturday. Nothing restocks.">
-    <meta name="robots" content="noindex,nofollow,noarchive">
-    <meta property="og:title" content="LASTGAZE">
-    <meta property="og:description" content="One of one. Once a week. Nothing restocks.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://lastgaze.com/">
     <meta name="theme-color" content="#050505">
     <link rel="icon" href="assets/lastgaze-mark.svg">
-    <script>
-        (function() {
-            try {
-                var host = location.hostname || '';
-                var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]';
-                if (isLocal) {
-                    sessionStorage.setItem('lg_open', '1');
-                } else if (sessionStorage.getItem('lg_open') !== '1') {
-                    location.replace('/password/');
-                }
-            } catch (e) {
-                location.replace('/password/');
-            }
-        })();
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LASTGAZE">
+    <meta property="og:url" content="https://lastgaze.com/">
+    <meta property="og:title" content="LASTGAZE — One of one. Once a week.">
+    <meta property="og:description" content="LASTGAZE is a vintage menswear archive out of New Delhi. Eight pieces. Every Saturday. Nothing restocks.">
+    <meta property="og:image" content="https://lastgaze.com/assets/og/lastgaze-og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="en_IN">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LASTGAZE — One of one. Once a week.">
+    <meta name="twitter:description" content="LASTGAZE is a vintage menswear archive out of New Delhi. Eight pieces. Every Saturday. Nothing restocks.">
+    <meta name="twitter:image" content="https://lastgaze.com/assets/og/lastgaze-og.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "LASTGAZE",
+      "url": "https://lastgaze.com/",
+      "logo": "https://lastgaze.com/assets/lastgaze-mark.svg",
+      "sameAs": [
+        "https://www.instagram.com/l4stgaze/"
+      ]
+    }
     </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "LASTGAZE",
+      "url": "https://lastgaze.com/"
+    }
+    </script>
+
     <link rel="stylesheet" href="assets/site.css">
     <link rel="stylesheet" href="css/menu-overlay.css">
 </head>
