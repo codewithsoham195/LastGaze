@@ -12,7 +12,7 @@
    ============================================================ */
 
 window.LASTGAZE_DROP = {
-  number: 4,                     // Drop 004
+  number: 1,                     // Drop 001
   opensAt: "2026-08-08T20:00:00+05:30",  // next Saturday 8PM IST
   password: "lastgaze"           // change this every drop
 };
