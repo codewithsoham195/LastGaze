@@ -6,12 +6,12 @@
   <title>Account — LASTGAZE</title>
   <meta name="description" content="Sign in to your LASTGAZE account to view your orders and manage saved addresses.">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <meta name="theme-color" content="#000">
+  <meta name="theme-color" content="#fff">
   <link rel="icon" href="/assets/lastgaze-mark.svg">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/css/pages.css">
 </head>
-<body class="ink pg">
+<body class="paper pg">
 
   <header class="pg-header">
     <div class="pg-header-left">
@@ -19,7 +19,7 @@
       <span class="pg-header-email" id="account-email" style="display:none"></span>
     </div>
     <a href="/" class="pg-brand" aria-label="LASTGAZE home">
-      <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+      <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
     </a>
     <div class="pg-header-right">
       <button type="button" class="pg-link-btn" id="signout-btn" style="display:none">Sign Out</button>
@@ -124,7 +124,7 @@
             </div>
           </div>
           <div class="pg-field">
-            <label style="display:flex;align-items:center;gap:8px;font-family:var(--body);font-size:13px;color:rgba(255,255,255,.6);">
+            <label style="display:flex;align-items:center;gap:8px;font-family:var(--body);font-size:13px;color:rgba(5,5,5,.6);">
               <input type="checkbox" id="address-default"> Set as default address
             </label>
           </div>
@@ -139,17 +139,48 @@
   </main>
 
   <style>
-    .ord-card { border: 1px solid rgba(255,255,255,.14); padding: 18px 20px; margin-bottom: 14px; }
+    /* This page overrides css/pages.css's dark theme with a white
+       surface — scoped here only, so the admin page (which shares
+       that stylesheet) stays on its dark theme. */
+    body.pg { background: #fff; }
+    .pg-header { background: #fff; border-bottom: 1px solid rgba(5,5,5,.08); }
+    .pg-close { color: #050505; }
+    .pg-header-email { color: rgba(5,5,5,.55); }
+    .pg-header-right { color: rgba(5,5,5,.5); }
+    .pg-h1, .pg-h2 { color: #050505; }
+    .pg-p { color: rgba(5,5,5,.72); }
+    .pg-p strong, .pg-p b { color: #050505; }
+    .pg-p a { color: rgba(5,5,5,.8); }
+    .pg-lead { color: rgba(5,5,5,.62); }
+    .pg-rule { border-top: 1px solid rgba(5,5,5,.1); }
+    .pg-updated { color: rgba(5,5,5,.28); }
+    .pg-tab { border: 1px solid rgba(5,5,5,.2); color: rgba(5,5,5,.55); }
+    .pg-tab.is-active { border-color: #050505; color: #050505; }
+    .pg-label { color: rgba(5,5,5,.4); }
+    .pg-input { border-bottom: 1px solid rgba(5,5,5,.28); color: #050505; caret-color: #050505; }
+    .pg-input:focus { border-color: rgba(5,5,5,.75); }
+    .pg-input::placeholder { color: rgba(5,5,5,.25); }
+    .pg-btn { background: #050505; color: #fff; }
+    .pg-btn--ghost { background: transparent; border: 1px solid rgba(5,5,5,.28); color: #050505; }
+    .pg-link-btn { color: rgba(5,5,5,.5); }
+    .pg-link-btn:hover { color: #050505; }
+    .pg-address-card { border: 1px solid rgba(5,5,5,.14); }
+    .pg-address-card__label { color: rgba(5,5,5,.4); }
+    .pg-address-card__default { color: #050505; border: 1px solid rgba(5,5,5,.35); }
+    .pg-address-card__body { color: rgba(5,5,5,.75); }
+    .pg-form-msg { color: rgba(5,5,5,.38); }
+
+    .ord-card { border: 1px solid rgba(5,5,5,.14); padding: 18px 20px; margin-bottom: 14px; }
     .ord-card-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-    .ord-date { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); }
-    .ord-ref { font-family: var(--util); font-size: 9px; letter-spacing: .08em; color: rgba(255,255,255,.3); }
+    .ord-date { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(5,5,5,.4); }
+    .ord-ref { font-family: var(--util); font-size: 9px; letter-spacing: .08em; color: rgba(5,5,5,.3); }
     .ord-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
-    .ord-item-frame { width: 44px; height: 56px; background: rgba(255,255,255,.06); overflow: hidden; flex-shrink: 0; }
+    .ord-item-frame { width: 44px; height: 56px; background: rgba(5,5,5,.06); overflow: hidden; flex-shrink: 0; }
     .ord-item-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .ord-item-name { font-family: var(--body); font-size: 13px; color: #fff; }
-    .ord-item-meta { font-family: var(--util); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.4); }
-    .ord-total { font-family: var(--util); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.5); padding-top: 12px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,.1); display: flex; justify-content: space-between; }
-    .ord-total strong { color: #fff; font-family: var(--body); font-size: 14px; letter-spacing: normal; text-transform: none; }
+    .ord-item-name { font-family: var(--body); font-size: 13px; color: #050505; }
+    .ord-item-meta { font-family: var(--util); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: rgba(5,5,5,.4); }
+    .ord-total { font-family: var(--util); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.5); padding-top: 12px; margin-top: 6px; border-top: 1px solid rgba(5,5,5,.1); display: flex; justify-content: space-between; }
+    .ord-total strong { color: #050505; font-family: var(--body); font-size: 14px; letter-spacing: normal; text-transform: none; }
   </style>
 
   <script src="/assets/products.js"></script>
