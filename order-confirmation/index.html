@@ -7,12 +7,27 @@
   <meta name="description" content="Your LASTGAZE order confirmation.">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <link rel="canonical" href="https://lastgaze.com/order-confirmation/">
-  <meta name="theme-color" content="#000">
+  <meta name="theme-color" content="#fff">
   <link rel="icon" href="/assets/lastgaze-mark.svg">
   <script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('/password/')}catch(e){location.replace('/password/')}</script>
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/css/pages.css">
   <style>
+    /* This page overrides css/pages.css's dark theme with a white
+       surface — scoped here only, so the admin page (which shares
+       that stylesheet) stays on its dark theme. */
+    body.pg { background: #fff; }
+    .pg-header { background: #fff; border-bottom: 1px solid rgba(5,5,5,.08); }
+    .pg-close { color: #050505; }
+    .pg-header-right { color: rgba(5,5,5,.5); }
+    .pg-h1, .pg-h2 { color: #050505; }
+    .pg-p { color: rgba(5,5,5,.72); }
+    .pg-p a { color: rgba(5,5,5,.8); }
+    .pg-lead { color: rgba(5,5,5,.62); }
+    .pg-btn { background: #050505; color: #fff; }
+    .pg-address-card { border: 1px solid rgba(5,5,5,.14); }
+    .pg-address-card__body { color: rgba(5,5,5,.75); }
+
     .oc-ref {
       text-align: center;
       margin: 0 0 clamp(48px, 8vw, 80px);
@@ -21,7 +36,7 @@
       font-family: var(--util);
       font-size: 12px;
       letter-spacing: .1em;
-      color: rgba(255,255,255,.7);
+      color: rgba(5,5,5,.7);
       margin-bottom: 6px;
     }
     .oc-ref-date {
@@ -29,10 +44,10 @@
       font-size: 10px;
       letter-spacing: .1em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.32);
+      color: rgba(5,5,5,.32);
     }
     .oc-item-card {
-      border: 1px solid rgba(255,255,255,.14);
+      border: 1px solid rgba(5,5,5,.14);
       padding: 18px;
       margin-bottom: 14px;
       display: grid;
@@ -43,7 +58,7 @@
     .oc-item-frame {
       width: 72px;
       height: 92px;
-      background: rgba(255,255,255,.05);
+      background: rgba(5,5,5,.05);
       overflow: hidden;
     }
     .oc-item-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -56,7 +71,7 @@
       font-size: 8.5px;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.35);
+      color: rgba(5,5,5,.35);
       text-align: center;
       padding: 4px;
     }
@@ -64,7 +79,7 @@
       font-family: var(--body);
       font-size: 14px;
       font-weight: 600;
-      color: #fff;
+      color: #050505;
       margin-bottom: 4px;
     }
     .oc-item-meta {
@@ -72,13 +87,13 @@
       font-size: 10px;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.4);
+      color: rgba(5,5,5,.4);
     }
     .oc-item-price {
       font-family: var(--body);
       font-size: 14px;
       font-weight: 700;
-      color: #fff;
+      color: #050505;
       white-space: nowrap;
     }
     .oc-total {
@@ -93,14 +108,14 @@
       font-size: 11px;
       letter-spacing: .12em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.5);
+      color: rgba(5,5,5,.5);
     }
     .oc-total-amount {
       font-family: var(--display);
       font-size: clamp(1.6rem, 4vw, 2.2rem);
       font-weight: 700;
       font-variation-settings: 'wdth' 112, 'wght' 700;
-      color: #fff;
+      color: #050505;
     }
     .oc-actions {
       max-width: 420px;
@@ -113,14 +128,14 @@
     }
   </style>
 </head>
-<body class="ink pg">
+<body class="paper pg">
 
   <header class="pg-header">
     <div class="pg-header-left">
       <a href="/" class="pg-close" aria-label="Back to home">×</a>
     </div>
     <a href="/" class="pg-brand" aria-label="LASTGAZE home">
-      <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+      <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
     </a>
     <div class="pg-header-right"></div>
   </header>
@@ -152,7 +167,7 @@
         </div>
       </div>
 
-      <p class="pg-p" style="text-align:center;font-size:13px;color:rgba(255,255,255,.45)">
+      <p class="pg-p" style="text-align:center;font-size:13px;color:rgba(5,5,5,.45)">
         Dispatched from New Delhi within 48 hours. Shipping across India takes 3–5 days, fully tracked.
         As every piece is a one-of-one, all sales are final — but reach out within 48 hours of delivery
         if there's an issue, and we'll make it right.
