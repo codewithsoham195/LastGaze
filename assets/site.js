@@ -240,6 +240,19 @@
     alert('Checkout is not connected yet. See README — step 4.');
   };
 
+  // Re-opens checkout automatically after checkout's sign-in prompt sends
+  // someone to /account/ and back — the cart survived in sessionStorage,
+  // so this just resumes where they left off instead of making them
+  // click Checkout a second time.
+  function resumeCheckoutIfNeeded() {
+    var params = new URLSearchParams(location.search);
+    if (params.get('resumeCheckout') !== '1') return;
+    params.delete('resumeCheckout');
+    var clean = location.pathname + (params.toString() ? '?' + params.toString() : '');
+    history.replaceState(null, '', clean);
+    window.LG_CHECKOUT();
+  }
+
   /* ---------- 8. countdown --------------------------------------- */
   function countdown() {
     var box = document.querySelector('[data-count]');
@@ -283,6 +296,7 @@
     document.querySelectorAll('[data-checkout]').forEach(function (b) {
       b.addEventListener('click', window.LG_CHECKOUT);
     });
+    resumeCheckoutIfNeeded();
     requestAnimationFrame(function () {
       document.querySelectorAll('.hero .rise').forEach(function (e, i) {
         setTimeout(function () { e.classList.add('in'); }, 180 + i * 110);

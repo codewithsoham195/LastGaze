@@ -35,12 +35,20 @@ function LG_SIGNIN_REQUIRED() {
     '<div style="background:#050505;color:#F0ECE6;max-width:380px;width:100%;padding:28px 24px;text-align:center;">' +
     '<h2 style="margin:0 0 10px;font-size:18px;">Sign in to check out</h2>' +
     '<p style="margin:0 0 22px;font-size:13px;color:rgba(240,236,230,.6);line-height:1.5;">Create a free account or sign in so we can confirm your order and keep your delivery details on file.</p>' +
-    '<a href="/account/" style="display:block;background:#F0ECE6;color:#050505;border:0;padding:13px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;margin-bottom:10px;">Sign in / Create account</a>' +
+    '<a href="/account/" data-lg-signin-link style="display:block;background:#F0ECE6;color:#050505;border:0;padding:13px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;margin-bottom:10px;">Sign in / Create account</a>' +
     '<button type="button" data-lg-signin-cancel style="width:100%;background:transparent;color:#F0ECE6;border:0;padding:10px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;opacity:.55;">Cancel</button>' +
     '</div>';
   document.body.appendChild(overlay);
   overlay.querySelector('[data-lg-signin-cancel]').addEventListener('click', function () {
     if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  });
+  // Remember where to come back to, so a successful sign-in on /account/
+  // returns the buyer straight into checkout instead of leaving them on
+  // the account page — the cart itself is already safe in sessionStorage.
+  overlay.querySelector('[data-lg-signin-link]').addEventListener('click', function (e) {
+    e.preventDefault();
+    try { sessionStorage.setItem('lg_resume_checkout', location.pathname + location.search); } catch (err) { }
+    location.href = '/account/';
   });
 }
 

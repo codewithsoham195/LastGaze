@@ -91,6 +91,18 @@ var LG_ACCOUNT_CONFIG = {
   }
 
   function showAccount(user) {
+    // Came here from checkout's "sign in required" prompt — go straight
+    // back instead of leaving the buyer stranded on the account page.
+    // The cart itself never left sessionStorage, so this just re-opens
+    // checkout where they left off.
+    var resumeUrl;
+    try { resumeUrl = sessionStorage.getItem('lg_resume_checkout'); } catch (e) { resumeUrl = null; }
+    if (resumeUrl) {
+      try { sessionStorage.removeItem('lg_resume_checkout'); } catch (e) { }
+      location.href = resumeUrl + (resumeUrl.indexOf('?') > -1 ? '&' : '?') + 'resumeCheckout=1';
+      return;
+    }
+
     authView.style.display = 'none';
     accountView.style.display = 'block';
     accountEmail.textContent = user.email;
