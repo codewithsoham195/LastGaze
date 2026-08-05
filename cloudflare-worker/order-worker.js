@@ -19,7 +19,8 @@
 // by the browser.
 const PRICES = {
   "009": 2000,
-  "010": 20000
+  "010": 20000,
+  "999": 1 // TEMPORARY — checkout/admin test listing, remove once verified
 };
 
 const ALLOWED_ORIGINS = [

@@ -56,5 +56,19 @@ window.LASTGAZE_PRODUCTS = [
     images: ["/img/products/stay-striped-tee-01.jpg"],
     condition: "9.5/10 — like-new condition with no visible stains, tears, or fading. Crew neckline and cuffs fully intact. Minimal signs of wear consistent with light or no prior use. Relaxed silhouette in black and cream stripe with woven STAY neck label.",
     measure: "Chest: 22\"<br>Length: 28\"<br>Shoulder: 19\"<br>Sleeve: 25\""
+  },
+  {
+    // TEMPORARY — checkout/admin test listing. Remove once verified.
+    lot: "999",
+    name: "Demo Tee — DO NOT BUY",
+    era: "Test listing",
+    cat: "tees",
+    price: 1,
+    size: "M",
+    sold: false,
+    image: "",
+    images: [],
+    condition: "This is a ₹1 test listing used to verify the checkout and admin order flow. Not a real product.",
+    measure: "N/A"
   }
 ];
