@@ -12,7 +12,10 @@ var LG_CONFIG = {
   // Format: country code + number, no + or spaces. e.g. India = 91XXXXXXXXXX
   whatsapp: "919999999999",
   // Where the signed order is created. See README step 4.
-  orderEndpoint: "https://lastgaze-order-worker.l4stgaze.workers.dev/"
+  orderEndpoint: "https://lastgaze-order-worker.l4stgaze.workers.dev/",
+  // Same account worker assets/account.js talks to — used here to look
+  // up a signed-in buyer's saved addresses at checkout.
+  accountApiBase: "https://lastgaze-account-worker.l4stgaze.workers.dev"
 };
 
 // Same key assets/account.js stores the session token under.
@@ -41,11 +44,70 @@ function LG_SIGNIN_REQUIRED() {
   });
 }
 
+/* ---- address picker — shown instead of the manual form when a signed-in
+   buyer already has saved addresses, so they don't have to retype one
+   they've already given us. ---- */
+function LG_ADDRESS_PICKER(addresses, onSelect, onUseNew, onCancel) {
+  var overlay = document.createElement('div');
+  overlay.setAttribute('style',
+    'position:fixed;inset:0;z-index:99999;background:rgba(5,5,5,.72);' +
+    'display:flex;align-items:center;justify-content:center;padding:20px;' +
+    'font-family:Arial,Helvetica,sans-serif;');
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  var cardsHtml = addresses.map(function (a, i) {
+    var lines = [a.full_name, a.line1, a.line2, [a.city, a.state, a.postal_code].filter(Boolean).join(', '), a.phone].filter(Boolean);
+    return '' +
+      '<button type="button" data-lg-addr="' + i + '" style="display:block;width:100%;text-align:left;background:transparent;border:1px solid rgba(240,236,230,.25);color:#F0ECE6;padding:14px 16px;margin-bottom:10px;cursor:pointer;font-size:13px;line-height:1.55;">' +
+      (a.label ? '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,236,230,.45);margin-bottom:6px;">' + escapeHtml(a.label) + (a.is_default ? ' · Default' : '') + '</div>' : '') +
+      escapeHtml(lines.join(', ')) +
+      '</button>';
+  }).join('');
+
+  overlay.innerHTML = '' +
+    '<div style="background:#050505;color:#F0ECE6;max-width:420px;width:100%;max-height:88vh;overflow:auto;padding:26px 24px;">' +
+    '<h2 style="margin:0 0 4px;font-size:18px;">Choose a delivery address</h2>' +
+    '<p style="margin:0 0 18px;font-size:13px;color:rgba(240,236,230,.55);">Where should we send this?</p>' +
+    cardsHtml +
+    '<button type="button" data-lg-addr-new style="width:100%;background:transparent;color:#F0ECE6;border:1px dashed rgba(240,236,230,.3);padding:13px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-top:4px;">Use a different address</button>' +
+    '<button type="button" data-lg-addr-cancel style="width:100%;background:transparent;color:#F0ECE6;border:0;padding:10px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;opacity:.55;margin-top:6px;">Cancel</button>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  function close() {
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  }
+
+  overlay.querySelectorAll('[data-lg-addr]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var a = addresses[Number(btn.getAttribute('data-lg-addr'))];
+      close();
+      onSelect(a);
+    });
+  });
+
+  overlay.querySelector('[data-lg-addr-new]').addEventListener('click', function () {
+    close();
+    onUseNew();
+  });
+
+  overlay.querySelector('[data-lg-addr-cancel]').addEventListener('click', function () {
+    close();
+    if (onCancel) onCancel();
+  });
+}
+
 /* ---- shipping form — asked once, before Razorpay opens, so every
    paid order has a name + address to ship to. Self-styled (no
    dependency on site.css classes) since this file is deliberately
    the one place that owns the payment flow. ---- */
-function LG_SHIPPING_FORM(onSubmit, onCancel) {
+function LG_SHIPPING_FORM(onSubmit, onCancel, prefill) {
   var overlay = document.createElement('div');
   overlay.setAttribute('style',
     'position:fixed;inset:0;z-index:99999;background:rgba(5,5,5,.72);' +
@@ -63,12 +125,19 @@ function LG_SHIPPING_FORM(onSubmit, onCancel) {
     ['postal_code', 'Pincode', 'text', 'postal-code']
   ];
 
+  function escapeAttr(s) {
+    return String(s || '').replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
   var inputHtml = fields.map(function (f) {
     var required = (f[0] !== 'email' && f[0] !== 'line2') ? ' required' : '';
+    var value = prefill && prefill[f[0]] ? ' value="' + escapeAttr(prefill[f[0]]) + '"' : '';
     return '' +
       '<label style="display:block;margin-bottom:14px;">' +
       '<span style="display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(240,236,230,.5);margin-bottom:6px;">' + f[1] + '</span>' +
-      '<input name="' + f[0] + '" type="' + f[2] + '" autocomplete="' + f[3] + '"' + required +
+      '<input name="' + f[0] + '" type="' + f[2] + '" autocomplete="' + f[3] + '"' + required + value +
       ' style="width:100%;box-sizing:border-box;border:0;border-bottom:1px solid rgba(240,236,230,.3);background:transparent;color:#F0ECE6;font-size:15px;padding:9px 0;outline:0;">' +
       '</label>';
   }).join('');
@@ -192,7 +261,45 @@ window.LG_PAY = function (cart) {
     document.head.appendChild(s);
   }
 
-  LG_SHIPPING_FORM(function (shipping) {
+  function proceedWithShipping(shipping) {
     withRazorpayLoaded(function () { boot(shipping); });
-  });
+  }
+
+  function startManualShipping(prefill) {
+    LG_SHIPPING_FORM(proceedWithShipping, undefined, prefill);
+  }
+
+  function addressToShipping(a) {
+    return {
+      name: a.full_name || '',
+      phone: a.phone || '',
+      email: '',
+      line1: a.line1 || '',
+      line2: a.line2 || '',
+      city: a.city || '',
+      state: a.state || '',
+      postal_code: a.postal_code || ''
+    };
+  }
+
+  // Saved addresses first, so a returning buyer doesn't retype one we
+  // already have. Falls back to the manual form if there are none, the
+  // lookup fails, or the buyer picks "use a different address" — and if
+  // a saved address is missing a phone number (optional in the address
+  // book), routes into the manual form pre-filled instead of silently
+  // dropping the shipping record (the worker requires phone).
+  fetch(LG_CONFIG.accountApiBase.replace(/\/$/, '') + '/account/addresses', {
+    headers: { "Authorization": "Bearer " + LG_SESSION_TOKEN() }
+  })
+    .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+    .then(function (data) {
+      var addresses = data.addresses || [];
+      if (!addresses.length) return startManualShipping();
+      LG_ADDRESS_PICKER(addresses, function (a) {
+        var shipping = addressToShipping(a);
+        if (!shipping.phone) return startManualShipping(shipping);
+        proceedWithShipping(shipping);
+      }, startManualShipping);
+    })
+    .catch(function () { startManualShipping(); });
 };
