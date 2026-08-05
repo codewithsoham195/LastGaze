@@ -211,7 +211,7 @@
       '<div class="bd">Sourced, washed, measured and photographed by hand. Nothing is restored beyond cleaning. What you see is what has survived.</div></details>' +
       '<button class="btn solid" data-buy' + (unavailable ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '>' +
       '<span>' + (p.sold ? 'Gone' : (p.comingSoon ? 'Details coming soon' : 'Add to bag')) + '</span></button>' +
-      '<button class="btn outline" data-checkout><span>Checkout</span></button>' +
+      '<button class="btn outline" data-checkout' + (unavailable ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '><span>Checkout</span></button>' +
       '</div>';
 
     var buy = info.querySelector('[data-buy]');
