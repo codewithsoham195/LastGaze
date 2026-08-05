@@ -140,8 +140,9 @@
 
   <style>
     /* This page overrides css/pages.css's dark theme with a white
-       surface — scoped here only, so the admin page (which shares
-       that stylesheet) stays on its dark theme. */
+       surface — scoped here only, since css/pages.css itself still
+       defaults dark (other pages using it without an override, if
+       any get added later, keep the dark theme). */
     body.pg { background: #fff; }
     .pg-header { background: #fff; border-bottom: 1px solid rgba(5,5,5,.08); }
     .pg-close { color: #050505; }

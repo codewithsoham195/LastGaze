@@ -5,41 +5,62 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Orders — LASTGAZE</title>
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <meta name="theme-color" content="#000">
+  <meta name="theme-color" content="#fff">
   <link rel="icon" href="/assets/lastgaze-mark.svg">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/css/pages.css">
   <style>
+    /* This page overrides css/pages.css's dark theme with a white
+       surface — scoped here only, so other pages sharing that
+       stylesheet (currently none — account/order-confirmation/contact
+       each carry their own copy of this same override) are unaffected. */
+    body.pg { background: #fff; }
+    .pg-header { background: #fff; border-bottom: 1px solid rgba(5,5,5,.08); }
+    .pg-close { color: #050505; }
+    .pg-header-right { color: rgba(5,5,5,.5); }
+    .pg-h1 { color: #050505; }
+    .pg-tab { border: 1px solid rgba(5,5,5,.2); color: rgba(5,5,5,.55); }
+    .pg-tab.is-active { border-color: #050505; color: #050505; }
+    .pg-label { color: rgba(5,5,5,.4); }
+    .pg-input { border-bottom: 1px solid rgba(5,5,5,.28); color: #050505; caret-color: #050505; }
+    .pg-input:focus { border-color: rgba(5,5,5,.75); }
+    .pg-input::placeholder { color: rgba(5,5,5,.25); }
+    .pg-btn { background: #050505; color: #fff; }
+    .pg-link-btn { color: rgba(5,5,5,.5); }
+    .pg-link-btn:hover { color: #050505; }
+    .pg-form-msg { color: rgba(5,5,5,.5); }
+
     .adm-toolbar { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 26px; }
-    .adm-count { font-family: var(--util); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+    .adm-count { font-family: var(--util); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(5,5,5,.5); }
     .adm-search { flex: 1 1 220px; max-width: 320px; }
-    .adm-order { border: 1px solid rgba(255,255,255,.14); padding: 20px 22px; margin-bottom: 14px; }
+    .adm-order { border: 1px solid rgba(5,5,5,.14); padding: 20px 22px; margin-bottom: 14px; }
     .adm-order-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; }
-    .adm-order-lots { font-family: var(--util); font-size: 12px; letter-spacing: .06em; }
-    .adm-order-amount { font-family: var(--util); font-size: 12px; color: rgba(255,255,255,.7); }
-    .adm-order-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.4); }
-    .adm-order-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(255,255,255,.85); white-space: pre-line; margin-bottom: 12px; }
+    .adm-order-lots { font-family: var(--util); font-size: 12px; letter-spacing: .06em; color: #050505; }
+    .adm-order-amount { font-family: var(--util); font-size: 12px; color: rgba(5,5,5,.7); }
+    .adm-order-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.4); }
+    .adm-order-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(5,5,5,.85); white-space: pre-line; margin-bottom: 12px; }
     .adm-order-actions { display: flex; gap: 16px; }
-    .adm-order-actions button { background: transparent; border: 0; color: rgba(255,255,255,.5); font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0; }
-    .adm-order-actions button:hover { color: #fff; }
-    .adm-empty { color: rgba(255,255,255,.5); font-size: 14px; }
-    .adm-msg { border: 1px solid rgba(255,255,255,.14); padding: 20px 22px; margin-bottom: 14px; }
+    .adm-order-actions button { background: transparent; border: 0; color: rgba(5,5,5,.5); font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0; }
+    .adm-order-actions button:hover { color: #050505; }
+    .adm-order-actions .pg-header-email { color: rgba(5,5,5,.4); }
+    .adm-empty { color: rgba(5,5,5,.5); font-size: 14px; }
+    .adm-msg { border: 1px solid rgba(5,5,5,.14); padding: 20px 22px; margin-bottom: 14px; }
     .adm-msg-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 8px; flex-wrap: wrap; }
-    .adm-msg-from { font-family: var(--body); font-size: 14px; color: #fff; }
-    .adm-msg-from a { color: rgba(255,255,255,.6); text-decoration: underline; text-underline-offset: 2px; }
-    .adm-msg-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.4); }
-    .adm-msg-subject { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 10px; }
-    .adm-msg-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(255,255,255,.85); white-space: pre-line; }
+    .adm-msg-from { font-family: var(--body); font-size: 14px; color: #050505; }
+    .adm-msg-from a { color: rgba(5,5,5,.6); text-decoration: underline; text-underline-offset: 2px; }
+    .adm-msg-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.4); }
+    .adm-msg-subject { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(5,5,5,.4); margin-bottom: 10px; }
+    .adm-msg-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(5,5,5,.85); white-space: pre-line; }
   </style>
 </head>
-<body class="ink pg">
+<body class="paper pg">
 
   <header class="pg-header">
     <div class="pg-header-left">
       <a href="/" class="pg-close" aria-label="Back to home">×</a>
     </div>
     <a href="/" class="pg-brand" aria-label="LASTGAZE home">
-      <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+      <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
     </a>
     <div class="pg-header-right">
       <button type="button" class="pg-link-btn" id="admin-signout-btn" style="display:none">Lock</button>

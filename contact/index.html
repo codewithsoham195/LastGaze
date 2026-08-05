@@ -14,22 +14,100 @@
   <link rel="stylesheet" href="/css/pages.css">
   <style>
     /* This page overrides css/pages.css's dark theme with a white
-       surface — scoped here only, so the admin page (which shares
-       that stylesheet) stays on its dark theme. */
+       surface — scoped here only, since css/pages.css itself still
+       defaults dark (other pages using it without an override, if
+       any get added later, keep the dark theme). */
     body.pg { background: #fff; }
     .pg-header { background: #fff; border-bottom: 1px solid rgba(5,5,5,.08); }
     .pg-close { color: #050505; }
     .pg-h1 { color: #050505; }
     .pg-lead { color: rgba(5,5,5,.62); }
-    .pg-label { color: rgba(5,5,5,.4); }
-    .pg-input { border-bottom: 1px solid rgba(5,5,5,.28); color: #050505; caret-color: #050505; }
-    .pg-input:focus { border-color: rgba(5,5,5,.75); }
-    .pg-input::placeholder { color: rgba(5,5,5,.25); }
-    .pg-btn { background: #050505; color: #fff; }
-    .pg-form-msg { color: rgba(5,5,5,.5); }
 
-    .pg-textarea { min-height: 130px; resize: vertical; }
-    select.pg-input { cursor: pointer; }
+    .contact-form {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .contact-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .contact-field {
+      border: 1px solid rgba(5,5,5,.2);
+      padding: 20px 18px;
+      margin-bottom: 20px;
+      transition: border-color .15s ease;
+    }
+    .contact-field:focus-within {
+      border-color: rgba(5,5,5,.6);
+    }
+    .contact-field input,
+    .contact-field select,
+    .contact-field textarea {
+      display: block;
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-family: var(--body);
+      font-size: 16px;
+      color: #050505;
+      padding: 0;
+    }
+    .contact-field input::placeholder,
+    .contact-field textarea::placeholder {
+      color: rgba(5,5,5,.55);
+    }
+    .contact-field textarea {
+      min-height: 220px;
+      resize: vertical;
+    }
+    .contact-field select {
+      cursor: pointer;
+      color: rgba(5,5,5,.55);
+    }
+    .contact-field select.is-chosen {
+      color: #050505;
+    }
+    .contact-submit-wrap {
+      text-align: center;
+      margin-top: 8px;
+    }
+    .contact-submit {
+      display: inline-block;
+      background: #050505;
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      padding: 16px 64px;
+      font-family: var(--body);
+      font-size: 16px;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .contact-submit:hover { opacity: .85; }
+    .contact-submit:disabled { opacity: .5; cursor: default; }
+    .contact-msg {
+      text-align: center;
+      font-family: var(--util);
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: rgba(5,5,5,.5);
+      margin-top: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .contact-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body class="paper pg">
@@ -44,22 +122,26 @@
     <div class="pg-header-right"></div>
   </header>
 
-  <main class="pg-main">
+  <main class="pg-main pg-main--wide">
     <h1 class="pg-h1">Get in touch</h1>
     <p class="pg-lead">Order help, sizing questions, press, or anything else — send it below and we'll get back to you.</p>
 
-    <form class="pg-fieldset" id="contact-form" novalidate>
-      <div class="pg-field">
-        <label class="pg-label" for="contact-name">Name</label>
-        <input class="pg-input" type="text" id="contact-name" required autocomplete="name">
+    <form class="contact-form" id="contact-form" novalidate>
+      <div class="contact-row">
+        <div class="contact-field">
+          <label class="sr-only" for="contact-name">Name</label>
+          <input type="text" id="contact-name" placeholder="Name *" required autocomplete="name">
+        </div>
+        <div class="contact-field">
+          <label class="sr-only" for="contact-email">Email</label>
+          <input type="email" id="contact-email" placeholder="Email *" required autocomplete="email">
+        </div>
       </div>
-      <div class="pg-field">
-        <label class="pg-label" for="contact-email">Email</label>
-        <input class="pg-input" type="email" id="contact-email" required autocomplete="email">
-      </div>
-      <div class="pg-field">
-        <label class="pg-label" for="contact-subject">Subject</label>
-        <select class="pg-input" id="contact-subject">
+
+      <div class="contact-field">
+        <label class="sr-only" for="contact-subject">Subject</label>
+        <select id="contact-subject">
+          <option value="" selected>Subject</option>
           <option value="General enquiry">General enquiry</option>
           <option value="Order support">Order support</option>
           <option value="Sizing / fit">Sizing / fit</option>
@@ -67,12 +149,16 @@
           <option value="Other">Other</option>
         </select>
       </div>
-      <div class="pg-field">
-        <label class="pg-label" for="contact-message">Message</label>
-        <textarea class="pg-input pg-textarea" id="contact-message" required></textarea>
+
+      <div class="contact-field">
+        <label class="sr-only" for="contact-message">Message</label>
+        <textarea id="contact-message" placeholder="Please enter your message *" required></textarea>
       </div>
-      <button class="pg-btn" type="submit">Submit</button>
-      <p class="pg-form-msg" id="contact-msg" role="status" aria-live="polite"></p>
+
+      <div class="contact-submit-wrap">
+        <button class="contact-submit" type="submit">Submit</button>
+      </div>
+      <p class="contact-msg" id="contact-msg" role="status" aria-live="polite"></p>
     </form>
   </main>
 

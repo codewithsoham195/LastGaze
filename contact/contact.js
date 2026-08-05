@@ -14,6 +14,11 @@ var LG_CONTACT_CONFIG = {
 
   var msg = document.getElementById('contact-msg');
   var submitBtn = form.querySelector('button[type="submit"]');
+  var subjectSelect = document.getElementById('contact-subject');
+
+  subjectSelect.addEventListener('change', function () {
+    subjectSelect.classList.toggle('is-chosen', !!subjectSelect.value);
+  });
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -38,6 +43,7 @@ var LG_CONTACT_CONFIG = {
       })
       .then(function () {
         form.reset();
+        subjectSelect.classList.remove('is-chosen');
         msg.textContent = "Sent — we'll get back to you soon.";
         submitBtn.disabled = false;
       })
