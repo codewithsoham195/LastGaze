@@ -8,6 +8,14 @@ moment it's actually paid for, and records each order's shipping details
 (name, phone, address) so you can look them up on the private `/admin/`
 order page — see [`admin/README.md`](../admin/README.md).
 
+**Checkout requires an account.** `/confirm-payment`'s order-creation step
+(the one that signs the price) rejects anyone without a valid session —
+resolved from the same `Authorization: Bearer <token>` the account worker
+issues, checked against the sessions table in the D1 database the two
+workers share. No service-to-service call needed, just a shared database.
+Orders are tagged with the buyer's account so they show up under "My
+orders" on `/account/` (see `cloudflare-worker-accounts/README.md`).
+
 Deploy this once, then point `assets/checkout.js`'s `orderEndpoint` at the
 deployed URL.
 
@@ -28,7 +36,9 @@ deployed URL.
    Database: the same `lastgaze` D1 database the account worker uses (see
    `cloudflare-worker-accounts/README.md` if you haven't created it yet).
 6. In that D1 database's **Console** tab, run `sold-lots-schema.sql` and
-   `orders-schema.sql` once each (only needed the first time).
+   `orders-schema.sql` once each (only needed the first time). If you ran
+   `orders-schema.sql` before it included the `user_id` column, also run
+   `orders-add-user-id.sql` once — skip it on a brand new database.
 7. Copy the worker's URL (`https://lastgaze-order-worker.<your-subdomain>.workers.dev`).
 8. Send that URL back — it goes into `orderEndpoint` in `assets/checkout.js`,
    alongside switching `keyId` to the live key.

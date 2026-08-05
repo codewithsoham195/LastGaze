@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS orders (
   city TEXT NOT NULL,
   state TEXT NOT NULL,
   postal_code TEXT NOT NULL,
+  user_id TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);

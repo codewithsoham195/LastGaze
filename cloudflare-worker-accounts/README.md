@@ -1,8 +1,14 @@
 # Account worker
 
-Handles customer signup, login, logout, and address book (add/edit/delete),
-backed by Cloudflare D1. Separate from `cloudflare-worker/order-worker.js` so
-your live payment worker is never touched by this.
+Handles customer signup, login, logout, address book (add/edit/delete), and
+order history, backed by Cloudflare D1. Separate from
+`cloudflare-worker/order-worker.js` so your live payment worker is never
+touched by this — but both bind the *same* `lastgaze` D1 database, so
+`/account/orders` can read the order worker's `orders` table directly with
+a plain SQL query, no service-to-service call. That means `/account/orders`
+only works once you've deployed the order worker and run its
+`orders-schema.sql` against this same database — see
+`cloudflare-worker/README.md`.
 
 Passwords are hashed with PBKDF2-SHA256 (100,000 iterations, random salt per
 user) — the plaintext password is never stored. Sessions are random tokens;

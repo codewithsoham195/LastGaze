@@ -15,6 +15,32 @@ var LG_CONFIG = {
   orderEndpoint: "https://lastgaze-order-worker.l4stgaze.workers.dev/"
 };
 
+// Same key assets/account.js stores the session token under.
+function LG_SESSION_TOKEN() {
+  try { return localStorage.getItem('lg_session_token') || ''; } catch (e) { return ''; }
+}
+
+/* ---- account gate — every order must belong to a signed-in account,
+   so checkout never even opens the shipping form for a guest. ---- */
+function LG_SIGNIN_REQUIRED() {
+  var overlay = document.createElement('div');
+  overlay.setAttribute('style',
+    'position:fixed;inset:0;z-index:99999;background:rgba(5,5,5,.72);' +
+    'display:flex;align-items:center;justify-content:center;padding:20px;' +
+    'font-family:Arial,Helvetica,sans-serif;');
+  overlay.innerHTML = '' +
+    '<div style="background:#050505;color:#F0ECE6;max-width:380px;width:100%;padding:28px 24px;text-align:center;">' +
+    '<h2 style="margin:0 0 10px;font-size:18px;">Sign in to check out</h2>' +
+    '<p style="margin:0 0 22px;font-size:13px;color:rgba(240,236,230,.6);line-height:1.5;">Create a free account or sign in so we can confirm your order and keep your delivery details on file.</p>' +
+    '<a href="/account/" style="display:block;background:#F0ECE6;color:#050505;border:0;padding:13px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;margin-bottom:10px;">Sign in / Create account</a>' +
+    '<button type="button" data-lg-signin-cancel style="width:100%;background:transparent;color:#F0ECE6;border:0;padding:10px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;opacity:.55;">Cancel</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('[data-lg-signin-cancel]').addEventListener('click', function () {
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  });
+}
+
 /* ---- shipping form — asked once, before Razorpay opens, so every
    paid order has a name + address to ship to. Self-styled (no
    dependency on site.css classes) since this file is deliberately
@@ -89,6 +115,8 @@ function LG_SHIPPING_FORM(onSubmit, onCancel) {
 }
 
 window.LG_PAY = function (cart) {
+  if (!LG_SESSION_TOKEN()) return LG_SIGNIN_REQUIRED();
+
   var amount = cart.total();
   var lots = cart.items.map(function (i) { return i.lot; }).join(', ');
 
@@ -122,11 +150,11 @@ window.LG_PAY = function (cart) {
         if (!LG_CONFIG.orderEndpoint) return redirect();
         // Tell the worker to independently verify this payment with
         // Razorpay, mark the lot(s) sold, and record the shipping
-        // details — best-effort, never blocks the buyer's success
-        // redirect if it fails.
+        // details (tagged to the signed-in account) — best-effort,
+        // never blocks the buyer's success redirect if it fails.
         fetch(LG_CONFIG.orderEndpoint.replace(/\/$/, '') + '/confirm-payment', {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + LG_SESSION_TOKEN() },
           body: JSON.stringify({ payment_id: res.razorpay_payment_id, shipping: shipping })
         }).then(redirect).catch(redirect);
       }
@@ -135,15 +163,25 @@ window.LG_PAY = function (cart) {
   }
 
   function boot(shipping) {
+    var token = LG_SESSION_TOKEN();
+    if (!token) return LG_SIGNIN_REQUIRED();
     if (!LG_CONFIG.orderEndpoint) return open(null, shipping);
+    // No silent fallback here on purpose: without a signed order_id from
+    // this call, Razorpay would open unsigned (a buyer could edit the
+    // price) and the purchase wouldn't be tied to an account — both are
+    // things this checkout is specifically built to prevent.
     fetch(LG_CONFIG.orderEndpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
       body: JSON.stringify({ amount: amount, items: cart.items })
     })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { open(d.id, shipping); })
-      .catch(function () { open(null, shipping); });
+      .then(function (r) {
+        if (r.status === 401) { LG_SIGNIN_REQUIRED(); return null; }
+        if (!r.ok) throw new Error('order failed');
+        return r.json();
+      })
+      .then(function (d) { if (d) open(d.id, shipping); })
+      .catch(function () { alert('Could not start checkout. Please try again.'); });
   }
 
   function withRazorpayLoaded(fn) {

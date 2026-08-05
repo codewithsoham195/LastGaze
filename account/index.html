@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Account — LASTGAZE</title>
-  <meta name="description" content="Sign in to your LASTGAZE account to manage your saved addresses.">
+  <meta name="description" content="Sign in to your LASTGAZE account to view your orders and manage saved addresses.">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="theme-color" content="#000">
   <link rel="icon" href="/assets/lastgaze-mark.svg">
@@ -68,64 +68,91 @@
     </div>
 
     <div id="account-view" style="display:none">
-      <h2 class="pg-h2" style="text-align:center;margin-bottom:24px;">Saved Addresses</h2>
-      <div class="pg-address-list" id="address-list"></div>
 
-      <div style="text-align:center;margin-bottom:40px;">
-        <button class="pg-btn pg-btn--ghost" type="button" id="add-address-btn" style="max-width:260px;margin:0 auto;">Add Address</button>
+      <div class="pg-tabs">
+        <button type="button" class="pg-tab is-active" data-account-tab="orders">Orders</button>
+        <button type="button" class="pg-tab" data-account-tab="addresses">Addresses</button>
       </div>
 
-      <form class="pg-fieldset" id="address-form" novalidate style="display:none">
-        <input type="hidden" id="address-id">
-        <div class="pg-field">
-          <label class="pg-label" for="address-label">Label (e.g. Home)</label>
-          <input class="pg-input" type="text" id="address-label">
+      <div id="orders-panel">
+        <div id="orders-list"></div>
+      </div>
+
+      <div id="addresses-panel" style="display:none">
+        <div class="pg-address-list" id="address-list"></div>
+
+        <div style="text-align:center;margin-bottom:40px;">
+          <button class="pg-btn pg-btn--ghost" type="button" id="add-address-btn" style="max-width:260px;margin:0 auto;">Add Address</button>
         </div>
-        <div class="pg-field">
-          <label class="pg-label" for="address-full-name">Full name</label>
-          <input class="pg-input" type="text" id="address-full-name" required>
-        </div>
-        <div class="pg-field">
-          <label class="pg-label" for="address-line1">Address line 1</label>
-          <input class="pg-input" type="text" id="address-line1" required>
-        </div>
-        <div class="pg-field">
-          <label class="pg-label" for="address-line2">Address line 2</label>
-          <input class="pg-input" type="text" id="address-line2">
-        </div>
-        <div class="pg-row2">
+
+        <form class="pg-fieldset" id="address-form" novalidate style="display:none">
+          <input type="hidden" id="address-id">
           <div class="pg-field">
-            <label class="pg-label" for="address-city">City</label>
-            <input class="pg-input" type="text" id="address-city" required>
+            <label class="pg-label" for="address-label">Label (e.g. Home)</label>
+            <input class="pg-input" type="text" id="address-label">
           </div>
           <div class="pg-field">
-            <label class="pg-label" for="address-state">State</label>
-            <input class="pg-input" type="text" id="address-state" required>
-          </div>
-        </div>
-        <div class="pg-row2">
-          <div class="pg-field">
-            <label class="pg-label" for="address-postal">Postal code</label>
-            <input class="pg-input" type="text" id="address-postal" required>
+            <label class="pg-label" for="address-full-name">Full name</label>
+            <input class="pg-input" type="text" id="address-full-name" required>
           </div>
           <div class="pg-field">
-            <label class="pg-label" for="address-phone">Phone</label>
-            <input class="pg-input" type="tel" id="address-phone">
+            <label class="pg-label" for="address-line1">Address line 1</label>
+            <input class="pg-input" type="text" id="address-line1" required>
           </div>
-        </div>
-        <div class="pg-field">
-          <label style="display:flex;align-items:center;gap:8px;font-family:var(--body);font-size:13px;color:rgba(255,255,255,.6);">
-            <input type="checkbox" id="address-default"> Set as default address
-          </label>
-        </div>
-        <button class="pg-btn" type="submit">Save Address</button>
-        <button class="pg-btn pg-btn--ghost" type="button" id="address-cancel" style="margin-top:10px;">Cancel</button>
-        <p class="pg-form-msg" id="address-msg" role="status" aria-live="polite"></p>
-      </form>
+          <div class="pg-field">
+            <label class="pg-label" for="address-line2">Address line 2</label>
+            <input class="pg-input" type="text" id="address-line2">
+          </div>
+          <div class="pg-row2">
+            <div class="pg-field">
+              <label class="pg-label" for="address-city">City</label>
+              <input class="pg-input" type="text" id="address-city" required>
+            </div>
+            <div class="pg-field">
+              <label class="pg-label" for="address-state">State</label>
+              <input class="pg-input" type="text" id="address-state" required>
+            </div>
+          </div>
+          <div class="pg-row2">
+            <div class="pg-field">
+              <label class="pg-label" for="address-postal">Postal code</label>
+              <input class="pg-input" type="text" id="address-postal" required>
+            </div>
+            <div class="pg-field">
+              <label class="pg-label" for="address-phone">Phone</label>
+              <input class="pg-input" type="tel" id="address-phone">
+            </div>
+          </div>
+          <div class="pg-field">
+            <label style="display:flex;align-items:center;gap:8px;font-family:var(--body);font-size:13px;color:rgba(255,255,255,.6);">
+              <input type="checkbox" id="address-default"> Set as default address
+            </label>
+          </div>
+          <button class="pg-btn" type="submit">Save Address</button>
+          <button class="pg-btn pg-btn--ghost" type="button" id="address-cancel" style="margin-top:10px;">Cancel</button>
+          <p class="pg-form-msg" id="address-msg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
     </div>
 
   </main>
 
+  <style>
+    .ord-card { border: 1px solid rgba(255,255,255,.14); padding: 18px 20px; margin-bottom: 14px; }
+    .ord-card-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
+    .ord-date { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+    .ord-ref { font-family: var(--util); font-size: 9px; letter-spacing: .08em; color: rgba(255,255,255,.3); }
+    .ord-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+    .ord-item-frame { width: 44px; height: 56px; background: rgba(255,255,255,.06); overflow: hidden; flex-shrink: 0; }
+    .ord-item-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ord-item-name { font-family: var(--body); font-size: 13px; color: #fff; }
+    .ord-item-meta { font-family: var(--util); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+    .ord-total { font-family: var(--util); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.5); padding-top: 12px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,.1); display: flex; justify-content: space-between; }
+    .ord-total strong { color: #fff; font-family: var(--body); font-size: 14px; letter-spacing: normal; text-transform: none; }
+  </style>
+
+  <script src="/assets/products.js"></script>
   <script src="/assets/account.js"></script>
 
 </body>

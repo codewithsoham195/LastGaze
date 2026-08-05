@@ -165,6 +165,16 @@ export default {
         return json({ user: me }, 200, headers);
       }
 
+      if (url.pathname === "/account/orders" && request.method === "GET") {
+        if (!me) return json({ error: "Not signed in" }, 401, headers);
+        // Reads the order worker's table directly — both workers share
+        // this D1 database, so no service-to-service call is needed.
+        const { results } = await db.prepare(
+          "SELECT payment_id, lots, amount, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC"
+        ).bind(me.id).all();
+        return json({ orders: results }, 200, headers);
+      }
+
       if (url.pathname === "/account/addresses" && request.method === "GET") {
         if (!me) return json({ error: "Not signed in" }, 401, headers);
         const { results } = await db.prepare(

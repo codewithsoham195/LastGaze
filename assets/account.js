@@ -48,7 +48,7 @@ var LG_ACCOUNT_CONFIG = {
   if (!authView) return; // not on the account page
 
   var accountView = document.getElementById('account-view');
-  var tabs = document.querySelectorAll('.pg-tab');
+  var tabs = document.querySelectorAll('#auth-view .pg-tab');
   var signinForm = document.getElementById('signin-form');
   var signupForm = document.getElementById('signup-account-form');
   var signinMsg = document.getElementById('signin-msg');
@@ -60,6 +60,10 @@ var LG_ACCOUNT_CONFIG = {
   var addressForm = document.getElementById('address-form');
   var addressMsg = document.getElementById('address-msg');
   var addressCancel = document.getElementById('address-cancel');
+  var accountTabs = document.querySelectorAll('[data-account-tab]');
+  var ordersPanel = document.getElementById('orders-panel');
+  var addressesPanel = document.getElementById('addresses-panel');
+  var ordersList = document.getElementById('orders-list');
 
   tabs.forEach(function (tab) {
     tab.addEventListener('click', function () {
@@ -68,6 +72,16 @@ var LG_ACCOUNT_CONFIG = {
       var isSignup = tab.dataset.tab === 'signup';
       signinForm.style.display = isSignup ? 'none' : 'block';
       signupForm.style.display = isSignup ? 'block' : 'none';
+    });
+  });
+
+  accountTabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      accountTabs.forEach(function (t) { t.classList.remove('is-active'); });
+      tab.classList.add('is-active');
+      var isAddresses = tab.dataset.accountTab === 'addresses';
+      ordersPanel.style.display = isAddresses ? 'none' : 'block';
+      addressesPanel.style.display = isAddresses ? 'block' : 'none';
     });
   });
 
@@ -82,6 +96,7 @@ var LG_ACCOUNT_CONFIG = {
     accountEmail.textContent = user.email;
     accountEmail.style.display = 'inline';
     signoutBtn.style.display = 'inline';
+    loadOrders();
     loadAddresses();
   }
 
@@ -138,6 +153,59 @@ var LG_ACCOUNT_CONFIG = {
     var div = document.createElement('div');
     div.textContent = str == null ? '' : str;
     return div.innerHTML;
+  }
+
+  function inr(paise) {
+    return '₹' + Math.round((paise || 0) / 100).toLocaleString('en-IN');
+  }
+
+  function findProduct(lot) {
+    var products = window.LASTGAZE_PRODUCTS || [];
+    return products.filter(function (p) { return p.lot === lot; })[0];
+  }
+
+  function renderOrders(orders) {
+    if (!orders.length) {
+      ordersList.innerHTML = '<p class="pg-form-msg" style="margin:0 0 20px;">No orders yet.</p>';
+      return;
+    }
+    ordersList.innerHTML = orders.map(function (o) {
+      var lots = String(o.lots || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      var itemsHtml = lots.map(function (lot) {
+        var p = findProduct(lot) || {};
+        var img = p.image || (p.images && p.images[0]) || '';
+        var thumb = img
+          ? '<img src="' + img + '" alt="' + escapeHtml(p.name || lot) + '">'
+          : '';
+        return '' +
+          '<div class="ord-item">' +
+          '<div class="ord-item-frame">' + thumb + '</div>' +
+          '<div>' +
+          '<div class="ord-item-name">' + escapeHtml(p.name || ('Lot ' + lot)) + '</div>' +
+          '<div class="ord-item-meta">Lot ' + escapeHtml(lot) + '</div>' +
+          '</div></div>';
+      }).join('');
+      var placed = o.created_at
+        ? new Date(o.created_at.replace(' ', 'T') + 'Z').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '';
+      return '' +
+        '<div class="ord-card">' +
+        '<div class="ord-card-top">' +
+        '<span class="ord-date">' + escapeHtml(placed) + '</span>' +
+        '<span class="ord-ref">' + escapeHtml(o.payment_id || '') + '</span>' +
+        '</div>' +
+        itemsHtml +
+        '<div class="ord-total"><span>Total paid</span><strong>' + inr(o.amount) + '</strong></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function loadOrders() {
+    api('/account/orders', { method: 'GET' }).then(function (data) {
+      renderOrders(data.orders || []);
+    }).catch(function () {
+      ordersList.innerHTML = '<p class="pg-form-msg">Could not load orders.</p>';
+    });
   }
 
   function renderAddresses(addresses) {

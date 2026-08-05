@@ -32,7 +32,7 @@ function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password",
+    "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password, Authorization",
     "Content-Type": "application/json"
   };
 }
@@ -45,7 +45,43 @@ function razorpayAuth(env) {
   return "Basic " + btoa(env.RAZORPAY_KEY_ID + ":" + env.RAZORPAY_KEY_SECRET);
 }
 
+function bufToHex(buf) {
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function sha256Hex(input) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return bufToHex(digest);
+}
+
+// Resolves the signed-in account (if any) from the same Authorization
+// bearer token the account worker issues — both workers share one D1
+// database, so a session created there is valid here without any
+// service-to-service call. createOrder() requires this to be non-null
+// (every purchase must belong to an account); confirmPayment() just
+// uses it best-effort to tag the order for "My orders".
+async function resolveSessionUserId(request, env) {
+  const auth = request.headers.get("Authorization") || "";
+  const match = auth.match(/^Bearer\s+(.+)$/i);
+  if (!match) return null;
+  try {
+    const tokenHash = await sha256Hex(match[1]);
+    const row = await env.DB.prepare(
+      "SELECT user_id FROM sessions WHERE token_hash = ? AND expires_at > datetime('now')"
+    ).bind(tokenHash).first();
+    return row ? row.user_id : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function createOrder(request, env, headers) {
+  // Every order must belong to a signed-in account — no guest checkout.
+  const userId = await resolveSessionUserId(request, env);
+  if (!userId) {
+    return json({ error: "Sign in required" }, 401, headers);
+  }
+
   let body;
   try {
     body = await request.json();
@@ -138,7 +174,8 @@ async function confirmPayment(request, env, headers) {
   // Shipping details are best-effort: a buyer's lot is marked sold above
   // regardless, so a bad/missing address never blocks their payment from
   // going through — it just means the order needs a manual follow-up.
-  await saveShippingDetails(env, paymentId, order.id, lots, payment.amount, body.shipping);
+  const userId = await resolveSessionUserId(request, env);
+  await saveShippingDetails(env, paymentId, order.id, lots, payment.amount, body.shipping, userId);
 
   return json({ ok: true, lots: lots }, 200, headers);
 }
@@ -150,12 +187,12 @@ function shippingIsValid(shipping) {
   return REQUIRED_SHIPPING_FIELDS.every(function (f) { return String(shipping[f] || "").trim(); });
 }
 
-async function saveShippingDetails(env, paymentId, orderId, lots, amount, shipping) {
+async function saveShippingDetails(env, paymentId, orderId, lots, amount, shipping, userId) {
   if (!shippingIsValid(shipping)) return;
   try {
     await env.DB.prepare(
-      "INSERT INTO orders (payment_id, order_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code) " +
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(payment_id) DO NOTHING"
+      "INSERT INTO orders (payment_id, order_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code, user_id) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(payment_id) DO NOTHING"
     ).bind(
       paymentId,
       orderId,
@@ -168,7 +205,8 @@ async function saveShippingDetails(env, paymentId, orderId, lots, amount, shippi
       String(shipping.line2 || "").trim(),
       String(shipping.city).trim(),
       String(shipping.state).trim(),
-      String(shipping.postal_code).trim()
+      String(shipping.postal_code).trim(),
+      userId || null
     ).run();
   } catch (e) {
     // Swallow — sold_lots is already recorded, which is what matters most.
