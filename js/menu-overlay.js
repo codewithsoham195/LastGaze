@@ -3,6 +3,7 @@
 
   var trigger = document.querySelector('.menu-trigger');
   var overlay = document.querySelector('.menu-overlay');
+  var overlayVideo = overlay ? overlay.querySelector('.menu-overlay__video') : null;
   var closeButton = document.querySelector('.menu-overlay__close');
   var bagButton = document.querySelector('.menu-overlay__bag');
   var links = overlay ? Array.prototype.slice.call(overlay.querySelectorAll('a')) : [];
@@ -26,6 +27,10 @@
     trigger.setAttribute('aria-expanded', 'true');
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
+    if (overlayVideo) {
+      overlayVideo.currentTime = 0;
+      overlayVideo.play();
+    }
     lockBody();
     lastFocused = document.activeElement;
     var firstLink = overlay.querySelector('a');
@@ -39,6 +44,9 @@
     trigger.setAttribute('aria-expanded', 'false');
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
+    if (overlayVideo) {
+      overlayVideo.pause();
+    }
     unlockBody();
     if (lastFocused && typeof lastFocused.focus === 'function') {
       lastFocused.focus();
@@ -59,8 +67,7 @@
     closeMenu();
   });
 
-  bagButton && bagButton.addEventListener('click', function (event) {
-    event.preventDefault();
+  bagButton && bagButton.addEventListener('click', function () {
     closeMenu();
   });
 
