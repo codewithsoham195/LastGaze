@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Orders — LASTGAZE</title>
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#000">
+  <link rel="icon" href="/assets/lastgaze-mark.svg">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <style>
+    .adm-toolbar { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 26px; }
+    .adm-count { font-family: var(--util); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+    .adm-search { flex: 1 1 220px; max-width: 320px; }
+    .adm-order { border: 1px solid rgba(255,255,255,.14); padding: 20px 22px; margin-bottom: 14px; }
+    .adm-order-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; }
+    .adm-order-lots { font-family: var(--util); font-size: 12px; letter-spacing: .06em; }
+    .adm-order-amount { font-family: var(--util); font-size: 12px; color: rgba(255,255,255,.7); }
+    .adm-order-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+    .adm-order-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(255,255,255,.85); white-space: pre-line; margin-bottom: 12px; }
+    .adm-order-actions { display: flex; gap: 16px; }
+    .adm-order-actions button { background: transparent; border: 0; color: rgba(255,255,255,.5); font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0; }
+    .adm-order-actions button:hover { color: #fff; }
+    .adm-empty { color: rgba(255,255,255,.5); font-size: 14px; }
+  </style>
+</head>
+<body class="ink pg">
+
+  <header class="pg-header">
+    <div class="pg-header-left">
+      <a href="/" class="pg-close" aria-label="Back to home">×</a>
+    </div>
+    <a href="/" class="pg-brand" aria-label="LASTGAZE home">
+      <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+    </a>
+    <div class="pg-header-right">
+      <button type="button" class="pg-link-btn" id="admin-signout-btn" style="display:none">Lock</button>
+    </div>
+  </header>
+
+  <main class="pg-main pg-main--wide">
+
+    <div id="admin-auth-view">
+      <h1 class="pg-h1">Orders</h1>
+      <form class="pg-fieldset" id="admin-login-form" novalidate>
+        <div class="pg-field">
+          <label class="pg-label" for="admin-password">Admin password</label>
+          <input class="pg-input" type="password" id="admin-password" required autocomplete="current-password">
+        </div>
+        <button class="pg-btn" type="submit">Enter</button>
+        <p class="pg-form-msg" id="admin-login-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div id="admin-orders-view" style="display:none">
+      <h1 class="pg-h1">Orders</h1>
+      <div class="adm-toolbar">
+        <span class="adm-count" id="admin-order-count"></span>
+        <input class="pg-input adm-search" type="search" id="admin-search" placeholder="Search by name, lot, phone, city…">
+      </div>
+      <div id="admin-order-list"></div>
+    </div>
+
+  </main>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

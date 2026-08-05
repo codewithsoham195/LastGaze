@@ -2,10 +2,11 @@
 
 Creates a signed Razorpay order server-side so a buyer can't tamper with the
 price before paying. Also verifies payment independently with Razorpay
-(never trusting the browser's own "it succeeded" callback) and records sold
-lots in D1, so `sold-lots` can grey out a piece on the shop/product pages the
-moment it's actually paid for — not whenever someone next edits
-`products.js` by hand.
+(never trusting the browser's own "it succeeded" callback), records sold
+lots in D1 so `sold-lots` can grey out a piece on the shop/product pages the
+moment it's actually paid for, and records each order's shipping details
+(name, phone, address) so you can look them up on the private `/admin/`
+order page — see [`admin/README.md`](../admin/README.md).
 
 Deploy this once, then point `assets/checkout.js`'s `orderEndpoint` at the
 deployed URL.
@@ -20,12 +21,14 @@ deployed URL.
 4. **Settings** → **Variables and Secrets** → **Add**:
    - `RAZORPAY_KEY_ID` — your `rzp_live_...` key
    - `RAZORPAY_KEY_SECRET` — your key secret
-   Add both as **Secret** (encrypted), not plain text. Save.
+   - `ADMIN_PASSWORD` — a strong password only you know; this is what gates
+     `/admin/orders` and, through it, the `/admin/` order page
+   Add all three as **Secret** (encrypted), not plain text. Save.
 5. **Bindings** → **Add binding** → **D1 database**. Variable name: `DB`.
    Database: the same `lastgaze` D1 database the account worker uses (see
    `cloudflare-worker-accounts/README.md` if you haven't created it yet).
-6. In that D1 database's **Console** tab, run `sold-lots-schema.sql` once
-   (only needed the first time).
+6. In that D1 database's **Console** tab, run `sold-lots-schema.sql` and
+   `orders-schema.sql` once each (only needed the first time).
 7. Copy the worker's URL (`https://lastgaze-order-worker.<your-subdomain>.workers.dev`).
 8. Send that URL back — it goes into `orderEndpoint` in `assets/checkout.js`,
    alongside switching `keyId` to the live key.
@@ -37,6 +40,8 @@ cd cloudflare-worker
 npx wrangler login
 npx wrangler secret put RAZORPAY_KEY_ID
 npx wrangler secret put RAZORPAY_KEY_SECRET
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler d1 execute lastgaze --file=orders-schema.sql --remote
 npx wrangler deploy
 ```
 

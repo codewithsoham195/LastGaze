@@ -31,7 +31,7 @@ function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password",
     "Content-Type": "application/json"
   };
 }
@@ -134,7 +134,61 @@ async function confirmPayment(request, env, headers) {
     ).bind(lot, paymentId).run();
   }
 
+  // Shipping details are best-effort: a buyer's lot is marked sold above
+  // regardless, so a bad/missing address never blocks their payment from
+  // going through — it just means the order needs a manual follow-up.
+  await saveShippingDetails(env, paymentId, order.id, lots, payment.amount, body.shipping);
+
   return json({ ok: true, lots: lots }, 200, headers);
+}
+
+const REQUIRED_SHIPPING_FIELDS = ["name", "phone", "line1", "city", "state", "postal_code"];
+
+function shippingIsValid(shipping) {
+  if (!shipping || typeof shipping !== "object") return false;
+  return REQUIRED_SHIPPING_FIELDS.every(function (f) { return String(shipping[f] || "").trim(); });
+}
+
+async function saveShippingDetails(env, paymentId, orderId, lots, amount, shipping) {
+  if (!shippingIsValid(shipping)) return;
+  try {
+    await env.DB.prepare(
+      "INSERT INTO orders (payment_id, order_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(payment_id) DO NOTHING"
+    ).bind(
+      paymentId,
+      orderId,
+      lots.join(", "),
+      amount,
+      String(shipping.name).trim(),
+      String(shipping.phone).trim(),
+      String(shipping.email || "").trim(),
+      String(shipping.line1).trim(),
+      String(shipping.line2 || "").trim(),
+      String(shipping.city).trim(),
+      String(shipping.state).trim(),
+      String(shipping.postal_code).trim()
+    ).run();
+  } catch (e) {
+    // Swallow — sold_lots is already recorded, which is what matters most.
+  }
+}
+
+function checkAdminAuth(request, env) {
+  const provided = request.headers.get("X-Admin-Password") || "";
+  const expected = env.ADMIN_PASSWORD || "";
+  return Boolean(expected) && provided === expected;
+}
+
+async function adminOrders(request, env, headers) {
+  if (!checkAdminAuth(request, env)) {
+    return json({ error: "Unauthorized" }, 401, headers);
+  }
+  const { results } = await env.DB.prepare(
+    "SELECT payment_id, order_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code, created_at " +
+    "FROM orders ORDER BY created_at DESC"
+  ).all();
+  return json({ orders: results }, 200, headers);
 }
 
 async function soldLots(env, headers) {
@@ -158,6 +212,9 @@ export default {
       }
       if (url.pathname === "/sold-lots" && request.method === "GET") {
         return await soldLots(env, headers);
+      }
+      if (url.pathname === "/admin/orders" && request.method === "GET") {
+        return await adminOrders(request, env, headers);
       }
       if (request.method === "POST") {
         return await createOrder(request, env, headers);
