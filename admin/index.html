@@ -23,6 +23,13 @@
     .adm-order-actions button { background: transparent; border: 0; color: rgba(255,255,255,.5); font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0; }
     .adm-order-actions button:hover { color: #fff; }
     .adm-empty { color: rgba(255,255,255,.5); font-size: 14px; }
+    .adm-msg { border: 1px solid rgba(255,255,255,.14); padding: 20px 22px; margin-bottom: 14px; }
+    .adm-msg-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 8px; flex-wrap: wrap; }
+    .adm-msg-from { font-family: var(--body); font-size: 14px; color: #fff; }
+    .adm-msg-from a { color: rgba(255,255,255,.6); text-decoration: underline; text-underline-offset: 2px; }
+    .adm-msg-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+    .adm-msg-subject { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 10px; }
+    .adm-msg-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(255,255,255,.85); white-space: pre-line; }
   </style>
 </head>
 <body class="ink pg">
@@ -54,12 +61,27 @@
     </div>
 
     <div id="admin-orders-view" style="display:none">
-      <h1 class="pg-h1">Orders</h1>
-      <div class="adm-toolbar">
-        <span class="adm-count" id="admin-order-count"></span>
-        <input class="pg-input adm-search" type="search" id="admin-search" placeholder="Search by name, lot, phone, city…">
+
+      <div class="pg-tabs">
+        <button type="button" class="pg-tab is-active" data-admin-tab="orders">Orders</button>
+        <button type="button" class="pg-tab" data-admin-tab="messages">Messages</button>
       </div>
-      <div id="admin-order-list"></div>
+
+      <div id="admin-orders-panel">
+        <div class="adm-toolbar">
+          <span class="adm-count" id="admin-order-count"></span>
+          <input class="pg-input adm-search" type="search" id="admin-search" placeholder="Search by name, lot, phone, city…">
+        </div>
+        <div id="admin-order-list"></div>
+      </div>
+
+      <div id="admin-messages-panel" style="display:none">
+        <div class="adm-toolbar">
+          <span class="adm-count" id="admin-message-count"></span>
+        </div>
+        <div id="admin-message-list"></div>
+      </div>
+
     </div>
 
   </main>

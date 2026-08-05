@@ -230,6 +230,46 @@ async function adminOrders(request, env, headers) {
   return json({ orders: results }, 200, headers);
 }
 
+function isValidEmail(email) {
+  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Public — the contact form on /contact/ posts here. No account or
+// payment involved, so this stays open (unlike createOrder).
+async function submitMessage(request, env, headers) {
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return json({ error: "Invalid JSON" }, 400, headers);
+  }
+
+  const name = String(body.name || "").trim().slice(0, 200);
+  const email = String(body.email || "").trim().slice(0, 200);
+  const subject = String(body.subject || "").trim().slice(0, 200);
+  const message = String(body.message || "").trim().slice(0, 5000);
+
+  if (!name || !message) return json({ error: "Missing name or message" }, 400, headers);
+  if (!isValidEmail(email)) return json({ error: "Invalid email" }, 400, headers);
+
+  const id = crypto.randomUUID();
+  await env.DB.prepare(
+    "INSERT INTO messages (id, name, email, subject, message) VALUES (?, ?, ?, ?, ?)"
+  ).bind(id, name, email, subject, message).run();
+
+  return json({ ok: true }, 200, headers);
+}
+
+async function adminMessages(request, env, headers) {
+  if (!checkAdminAuth(request, env)) {
+    return json({ error: "Unauthorized" }, 401, headers);
+  }
+  const { results } = await env.DB.prepare(
+    "SELECT id, name, email, subject, message, created_at FROM messages ORDER BY created_at DESC"
+  ).all();
+  return json({ messages: results }, 200, headers);
+}
+
 async function soldLots(env, headers) {
   const { results } = await env.DB.prepare("SELECT lot FROM sold_lots").all();
   return json({ lots: results.map(function (r) { return r.lot; }) }, 200, headers);
@@ -254,6 +294,12 @@ export default {
       }
       if (url.pathname === "/admin/orders" && request.method === "GET") {
         return await adminOrders(request, env, headers);
+      }
+      if (url.pathname === "/contact" && request.method === "POST") {
+        return await submitMessage(request, env, headers);
+      }
+      if (url.pathname === "/admin/messages" && request.method === "GET") {
+        return await adminMessages(request, env, headers);
       }
       if (request.method === "POST") {
         return await createOrder(request, env, headers);

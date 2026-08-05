@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Contact — LASTGAZE</title>
+  <meta name="description" content="Get in touch with LASTGAZE — order help, sizing, press, or general questions.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <link rel="canonical" href="https://lastgaze.com/contact/">
+  <meta name="theme-color" content="#fff">
+  <link rel="icon" href="/assets/lastgaze-mark.svg">
+  <script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('/password/')}catch(e){location.replace('/password/')}</script>
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <style>
+    /* This page overrides css/pages.css's dark theme with a white
+       surface — scoped here only, so the admin page (which shares
+       that stylesheet) stays on its dark theme. */
+    body.pg { background: #fff; }
+    .pg-header { background: #fff; border-bottom: 1px solid rgba(5,5,5,.08); }
+    .pg-close { color: #050505; }
+    .pg-h1 { color: #050505; }
+    .pg-lead { color: rgba(5,5,5,.62); }
+    .pg-label { color: rgba(5,5,5,.4); }
+    .pg-input { border-bottom: 1px solid rgba(5,5,5,.28); color: #050505; caret-color: #050505; }
+    .pg-input:focus { border-color: rgba(5,5,5,.75); }
+    .pg-input::placeholder { color: rgba(5,5,5,.25); }
+    .pg-btn { background: #050505; color: #fff; }
+    .pg-form-msg { color: rgba(5,5,5,.5); }
+
+    .pg-textarea { min-height: 130px; resize: vertical; }
+    select.pg-input { cursor: pointer; }
+  </style>
+</head>
+<body class="paper pg">
+
+  <header class="pg-header">
+    <div class="pg-header-left">
+      <a href="/shop/" class="pg-close" aria-label="Back to shop">×</a>
+    </div>
+    <a href="/" class="pg-brand" aria-label="LASTGAZE home">
+      <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
+    </a>
+    <div class="pg-header-right"></div>
+  </header>
+
+  <main class="pg-main">
+    <h1 class="pg-h1">Get in touch</h1>
+    <p class="pg-lead">Order help, sizing questions, press, or anything else — send it below and we'll get back to you.</p>
+
+    <form class="pg-fieldset" id="contact-form" novalidate>
+      <div class="pg-field">
+        <label class="pg-label" for="contact-name">Name</label>
+        <input class="pg-input" type="text" id="contact-name" required autocomplete="name">
+      </div>
+      <div class="pg-field">
+        <label class="pg-label" for="contact-email">Email</label>
+        <input class="pg-input" type="email" id="contact-email" required autocomplete="email">
+      </div>
+      <div class="pg-field">
+        <label class="pg-label" for="contact-subject">Subject</label>
+        <select class="pg-input" id="contact-subject">
+          <option value="General enquiry">General enquiry</option>
+          <option value="Order support">Order support</option>
+          <option value="Sizing / fit">Sizing / fit</option>
+          <option value="Press / collab">Press / collab</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="pg-field">
+        <label class="pg-label" for="contact-message">Message</label>
+        <textarea class="pg-input pg-textarea" id="contact-message" required></textarea>
+      </div>
+      <button class="pg-btn" type="submit">Submit</button>
+      <p class="pg-form-msg" id="contact-msg" role="status" aria-live="polite"></p>
+    </form>
+  </main>
+
+  <script src="/contact/contact.js"></script>
+</body>
+</html>

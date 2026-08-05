@@ -25,8 +25,24 @@ var LG_ADMIN_CONFIG = {
   var searchInput = document.getElementById('admin-search');
   var orderList = document.getElementById('admin-order-list');
   var orderCount = document.getElementById('admin-order-count');
+  var adminTabs = document.querySelectorAll('[data-admin-tab]');
+  var ordersPanel = document.getElementById('admin-orders-panel');
+  var messagesPanel = document.getElementById('admin-messages-panel');
+  var messageList = document.getElementById('admin-message-list');
+  var messageCount = document.getElementById('admin-message-count');
 
   var allOrders = [];
+  var allMessages = [];
+
+  adminTabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      adminTabs.forEach(function (t) { t.classList.remove('is-active'); });
+      tab.classList.add('is-active');
+      var isMessages = tab.dataset.adminTab === 'messages';
+      ordersPanel.style.display = isMessages ? 'none' : 'block';
+      messagesPanel.style.display = isMessages ? 'block' : 'none';
+    });
+  });
 
   function getPassword() {
     return sessionStorage.getItem(PW_KEY) || '';
@@ -50,6 +66,37 @@ var LG_ADMIN_CONFIG = {
       if (!res.ok) throw new Error('Could not load orders.');
       return res.json();
     });
+  }
+
+  function fetchMessages(password) {
+    return fetch(LG_ADMIN_CONFIG.apiBase.replace(/\/$/, '') + '/admin/messages', {
+      headers: { 'X-Admin-Password': password }
+    }).then(function (res) {
+      if (res.status === 401) throw new Error('Wrong password.');
+      if (!res.ok) throw new Error('Could not load messages.');
+      return res.json();
+    });
+  }
+
+  function renderMessages() {
+    messageCount.textContent = allMessages.length + (allMessages.length === 1 ? ' message' : ' messages');
+
+    if (!allMessages.length) {
+      messageList.innerHTML = '<p class="adm-empty">No messages yet.</p>';
+      return;
+    }
+
+    messageList.innerHTML = allMessages.map(function (m) {
+      return '' +
+        '<div class="adm-msg">' +
+        '<div class="adm-msg-top">' +
+        '<span class="adm-msg-from">' + escapeHtml(m.name) + ' · <a href="mailto:' + escapeHtml(m.email) + '">' + escapeHtml(m.email) + '</a></span>' +
+        '<span class="adm-msg-date">' + escapeHtml((m.created_at || '').replace('T', ' ').slice(0, 16)) + '</span>' +
+        '</div>' +
+        (m.subject ? '<div class="adm-msg-subject">' + escapeHtml(m.subject) + '</div>' : '') +
+        '<div class="adm-msg-body">' + escapeHtml(m.message) + '</div>' +
+        '</div>';
+    }).join('');
   }
 
   function addressBlock(o) {
@@ -122,6 +169,12 @@ var LG_ADMIN_CONFIG = {
       allOrders = data.orders || [];
       showOrders();
       renderOrders(searchInput.value);
+      // Best-effort: messages loading shouldn't block the orders view
+      // that already succeeded.
+      fetchMessages(password).then(function (msgData) {
+        allMessages = msgData.messages || [];
+        renderMessages();
+      }).catch(function () { });
     });
   }
 
@@ -137,6 +190,7 @@ var LG_ADMIN_CONFIG = {
   signoutBtn.addEventListener('click', function () {
     sessionStorage.removeItem(PW_KEY);
     allOrders = [];
+    allMessages = [];
     showLogin('');
   });
 
