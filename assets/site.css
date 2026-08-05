@@ -1905,6 +1905,34 @@ body.menu-open {
     color: var(--bg)
 }
 
+.pdp-info .btn.outline {
+    width: 100%;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--fg);
+    padding: 17px 20px;
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-shadow: none;
+    text-transform: uppercase;
+    color: var(--fg);
+}
+
+.pdp-info .btn.outline span {
+    color: var(--fg)
+}
+
+.pdp-info .btn.outline:hover {
+    background: var(--fg);
+    color: var(--bg);
+}
+
+.pdp-info .btn.outline:hover span {
+    color: var(--bg)
+}
+
 .sizes {
     display: flex;
     flex-wrap: wrap;

@@ -196,8 +196,6 @@
       '</div>' +
       '<div class="pdp-secondary">' +
       sizeControl +
-      '<button class="btn solid" data-buy' + (unavailable ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '>' +
-      '<span>' + (p.sold ? 'Gone' : (p.comingSoon ? 'Details coming soon' : 'Add to bag')) + '</span></button>' +
       '<details class="acc"><summary><span class="lab">Description</span><span class="pm">+</span></summary>' +
       '<div class="bd">' + p.condition + '</div></details>' +
       '<details class="acc"><summary><span class="lab">Measurements</span><span class="pm">+</span></summary>' +
@@ -207,6 +205,9 @@
       'As every piece is a one-of-one, all sales are final — but please reach out within 48 hours of delivery if there\'s an issue, and we\'ll make it right.</div></details>' +
       '<details class="acc"><summary><span class="lab">On this piece</span><span class="pm">+</span></summary>' +
       '<div class="bd">Sourced, washed, measured and photographed by hand. Nothing is restored beyond cleaning. What you see is what has survived.</div></details>' +
+      '<button class="btn solid" data-buy' + (unavailable ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '>' +
+      '<span>' + (p.sold ? 'Gone' : (p.comingSoon ? 'Details coming soon' : 'Add to bag')) + '</span></button>' +
+      '<button class="btn outline" data-checkout><span>Checkout</span></button>' +
       '</div>';
 
     var buy = info.querySelector('[data-buy]');
@@ -216,6 +217,9 @@
         buy.querySelector('span').textContent = r === 'added' ? 'In your bag' : 'Already in bag';
       });
     }
+
+    var checkoutBtn = info.querySelector('[data-checkout]');
+    if (checkoutBtn) checkoutBtn.addEventListener('click', window.LG_CHECKOUT);
   }
 
   /* ---------- 7. checkout ---------------------------------------- */
