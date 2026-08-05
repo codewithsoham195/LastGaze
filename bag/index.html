@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LASTGAZE — Bag</title>
+  <meta name="description" content="Your LASTGAZE bag.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <link rel="canonical" href="https://lastgaze.com/bag/">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="/assets/lastgaze-mark.svg">
+  <script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('/password/')}catch(e){location.replace('/password/')}</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 13px; }
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #000;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; }
+    button { font: inherit; }
+    ul { list-style: none; }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      padding: 0 20px;
+      height: 54px;
+      border-bottom: 1px solid #e8e8e8;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 100;
+    }
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+    .header-left { justify-content: flex-start; }
+    .header-right { justify-content: flex-end; gap: 20px; }
+    .header-left a, .header-right a {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 0;
+    }
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      justify-self: center;
+    }
+    .header-logo img {
+      display: block;
+      width: auto;
+      height: 18px;
+    }
+    .cart-count { display: inline-flex; align-items: center; }
+    .cart-count sup {
+      font-size: 9px;
+      font-weight: 700;
+      margin-left: 1px;
+      vertical-align: super;
+    }
+
+    .bag-main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px 100px;
+      min-height: 56vh;
+    }
+    .bag-h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .bag-empty {
+      text-align: center;
+      padding: 60px 24px;
+      border: 1px solid #e8e8e8;
+      background: #fafafa;
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+    }
+    .bag-empty p {
+      font-size: 13px;
+      color: #666;
+    }
+    .bag-empty a {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 13px 26px;
+    }
+
+    .bag-row {
+      display: grid;
+      grid-template-columns: 84px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 18px 0;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .bag-frame {
+      width: 84px;
+      height: 108px;
+      background: #f4f4f4;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .bag-frame img { width: 100%; height: 100%; object-fit: cover; }
+    .bag-frame-empty {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      font-size: 9.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #999;
+      text-align: center;
+      padding: 6px;
+    }
+    .bag-row-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .bag-row-meta {
+      font-size: 11px;
+      color: #888;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .bag-row-price {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .bag-remove {
+      background: none;
+      border: 0;
+      font-size: 20px;
+      line-height: 1;
+      color: #999;
+      cursor: pointer;
+      padding: 4px 8px;
+      align-self: start;
+    }
+    .bag-remove:hover { color: #000; }
+
+    .bag-summary {
+      margin-top: 28px;
+      padding-top: 20px;
+    }
+    .bag-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 20px;
+    }
+    .bag-summary-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #888;
+    }
+    .bag-summary-total {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .bag-checkout-btn {
+      display: block;
+      width: 100%;
+      background: #000;
+      color: #fff;
+      border: 0;
+      padding: 16px 0;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .bag-checkout-btn:hover { opacity: 0.85; }
+    .bag-continue {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #666;
+    }
+    .bag-continue:hover { color: #000; }
+
+    footer {
+      background: #000;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+    .footer-col h5 {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+    .footer-col ul li { margin-bottom: 8px; }
+    .footer-col ul li a {
+      font-size: 11px;
+      color: #aaa;
+      letter-spacing: 0.03em;
+      transition: color 0.15s;
+    }
+    .footer-col ul li a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #333;
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-bottom p {
+      font-size: 10.5px;
+      color: #666;
+      letter-spacing: 0.04em;
+    }
+    .footer-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-logo img {
+      display: block;
+      width: auto;
+      height: 16px;
+    }
+
+    @media (max-width: 540px) {
+      header { padding: 0 12px; }
+      .bag-row { grid-template-columns: 64px 1fr auto; }
+      .bag-frame { width: 64px; height: 82px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <a href="/shop/">Shop</a>
+    </div>
+    <a href="/" class="header-logo" aria-label="LASTGAZE home">
+      <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
+    </a>
+    <div class="header-right">
+      <a href="/account/">Account</a>
+    </div>
+  </header>
+
+  <main class="bag-main">
+    <h1 class="bag-h1">Your bag</h1>
+
+    <div id="bagEmpty" class="bag-empty" style="display:none">
+      <p>Your bag is empty.</p>
+      <a href="/shop/">Continue shopping</a>
+    </div>
+
+    <div id="bagList"></div>
+
+    <div id="bagSummary" class="bag-summary" style="display:none">
+      <div class="bag-summary-row">
+        <span class="bag-summary-label" id="bagCountLabel"></span>
+        <span class="bag-summary-total" id="bagTotal"></span>
+      </div>
+      <button type="button" class="bag-checkout-btn" data-checkout>Checkout</button>
+      <a href="/shop/" class="bag-continue">Continue shopping</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-top">
+      <div class="footer-col">
+        <h5>Shop</h5>
+        <ul>
+          <li><a href="/shop/">All pieces</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="/">Our story</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <ul>
+          <li><a href="mailto:l4stgaze@gmail.com">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="https://www.instagram.com/l4stgaze/" target="_blank" rel="noopener">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 LASTGAZE — New Delhi, India</p>
+      <div class="footer-logo">
+        <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+      </div>
+    </div>
+  </footer>
+
+  <script src="/assets/products.js"></script>
+  <script src="/assets/site.js"></script>
+  <script src="/assets/checkout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var products = window.LASTGAZE_PRODUCTS || [];
+      var listEl = document.getElementById('bagList');
+      var emptyEl = document.getElementById('bagEmpty');
+      var summaryEl = document.getElementById('bagSummary');
+
+      function inr(n) { return '₹' + n.toLocaleString('en-IN'); }
+
+      function findProduct(lot) {
+        return products.filter(function (p) { return p.lot === lot; })[0];
+      }
+
+      function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      function render() {
+        var items = window.LG_CART ? window.LG_CART.items : [];
+
+        if (!items.length) {
+          listEl.innerHTML = '';
+          emptyEl.style.display = 'grid';
+          summaryEl.style.display = 'none';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+        summaryEl.style.display = 'block';
+
+        listEl.innerHTML = items.map(function (item) {
+          var p = findProduct(item.lot) || {};
+          var img = p.image || (p.images && p.images[0]) || '';
+          var thumb = img
+            ? '<img src="' + img + '" alt="' + escapeHtml(item.name) + '">'
+            : '<div class="bag-frame-empty">Lot ' + escapeHtml(item.lot) + '</div>';
+          return '' +
+            '<div class="bag-row" data-lot="' + escapeHtml(item.lot) + '">' +
+            '<div class="bag-frame">' + thumb + '</div>' +
+            '<div>' +
+            '<div class="bag-row-name">' + escapeHtml(item.name) + '</div>' +
+            '<div class="bag-row-meta">Lot ' + escapeHtml(item.lot) + (item.size ? ' · Size ' + escapeHtml(item.size) : '') + '</div>' +
+            '<div class="bag-row-price">' + inr(item.price) + '</div>' +
+            '</div>' +
+            '<button type="button" class="bag-remove" data-remove="' + escapeHtml(item.lot) + '" aria-label="Remove ' + escapeHtml(item.name) + '">&times;</button>' +
+            '</div>';
+        }).join('');
+
+        document.getElementById('bagTotal').textContent = inr(window.LG_CART.total());
+        document.getElementById('bagCountLabel').textContent = items.length + (items.length === 1 ? ' item' : ' items');
+
+        listEl.querySelectorAll('[data-remove]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            window.LG_CART.remove(btn.getAttribute('data-remove'));
+            render();
+          });
+        });
+      }
+
+      render();
+    });
+  </script>
+</body>
+</html>

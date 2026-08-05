@@ -104,6 +104,10 @@
       this.save();
       return 'added';
     },
+    remove: function (lot) {
+      this.items = this.items.filter(function (i) { return i.lot !== lot; });
+      this.save();
+    },
     total: function () { return this.items.reduce(function (s, i) { return s + i.price; }, 0); },
     paint: function () {
       var n = this.items.length;

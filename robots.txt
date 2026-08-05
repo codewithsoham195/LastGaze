@@ -3,6 +3,7 @@ Allow: /
 
 # Transactional / private — these carry noindex on-page as well
 Disallow: /cart/
+Disallow: /bag/
 Disallow: /checkout/
 Disallow: /account/
 Disallow: /order-confirmation/

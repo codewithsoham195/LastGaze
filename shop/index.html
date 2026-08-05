@@ -423,7 +423,7 @@
       <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
     </a>
     <div class="header-right">
-      <a href="#" class="hide-mobile">Search</a>
+      <a href="/bag/" class="cart-count">Bag<sup id="bagCount"></sup></a>
       <a href="/account/">Account</a>
     </div>
   </header>
@@ -431,18 +431,12 @@
   <nav class="cat-nav">
     <ul>
       <li><a href="#" data-cat="sale">Sale</a></li>
-      <li><a href="#" data-cat="new">New</a></li>
+      <li><a href="#" data-cat="new" class="active">New</a></li>
       <li><a href="#" data-cat="denim">Denim</a></li>
-      <li><a href="#" data-cat="sweats">Sweats</a></li>
       <li><a href="#" data-cat="tees">Tees</a></li>
       <li><a href="#" data-cat="headwear">Headwear</a></li>
-      <li><a href="#" data-cat="tops">Tops</a></li>
-      <li><a href="#" data-cat="shorts">Shorts</a></li>
-      <li><a href="#" data-cat="pants">Pants</a></li>
       <li><a href="#" data-cat="outerwear">Outerwear</a></li>
       <li><a href="#" data-cat="accessories">Accessories</a></li>
-      <li><a href="#" data-cat="bags">Bags</a></li>
-      <li><a href="#" data-cat="all" class="active">All</a></li>
     </ul>
   </nav>
 
@@ -501,7 +495,7 @@
     /* ---- product grid ---- */
     const grid = document.getElementById('productGrid');
     const all = window.LASTGAZE_PRODUCTS || [];
-    let activeCat = 'all';
+    let activeCat = 'new';
 
     function priceLabel(p) {
       if (p.comingSoon || p.price == null) return 'Coming soon';
@@ -536,9 +530,8 @@
 
     function matches(p) {
       if (activeCat === 'sale') return !!p.sale;
-      if (activeCat === 'new') return !!p.comingSoon;
-      if (activeCat !== 'all' && p.cat !== activeCat) return false;
-      return true;
+      if (activeCat === 'new') return !!p.isNew;
+      return p.cat === activeCat;
     }
 
     function render() {
@@ -573,6 +566,15 @@
         all.forEach((p) => { if (soldLots.includes(p.lot)) p.sold = true; });
         render();
       });
+
+    /* ---- bag count badge ---- */
+    (function () {
+      var badge = document.getElementById('bagCount');
+      if (!badge) return;
+      var items = [];
+      try { items = JSON.parse(sessionStorage.getItem('lg_cart') || '[]'); } catch (e) { }
+      if (items.length) badge.textContent = items.length;
+    })();
   </script>
 </body>
 </html>
