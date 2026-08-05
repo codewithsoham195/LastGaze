@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Next Drop — LASTGAZE</title>
+  <meta name="description" content="Countdown to the next LASTGAZE drop: eight one-of-one vintage pieces, every Saturday at 8PM IST. See the full timeline from sourcing to sale.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://lastgaze.com/next-drop/">
+  <meta name="theme-color" content="#000">
+  <link rel="icon" href="/assets/lastgaze-mark.svg">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LASTGAZE">
+  <meta property="og:url" content="https://lastgaze.com/next-drop/">
+  <meta property="og:title" content="Next Drop — LASTGAZE">
+  <meta property="og:description" content="Countdown to the next LASTGAZE drop: eight one-of-one vintage pieces, every Saturday at 8PM IST.">
+  <meta property="og:image" content="https://lastgaze.com/assets/og/lastgaze-og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_IN">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Next Drop — LASTGAZE">
+  <meta name="twitter:description" content="Countdown to the next LASTGAZE drop: eight one-of-one vintage pieces, every Saturday at 8PM IST.">
+  <meta name="twitter:image" content="https://lastgaze.com/assets/og/lastgaze-og.jpg">
+
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <style>
+    .count.pg-count {
+      justify-content: center;
+      margin: 0 auto clamp(36px, 6vw, 56px);
+    }
+
+    .pg-drop-label {
+      display: block;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .pg-cta {
+      text-align: center;
+      margin: 0 auto clamp(56px, 9vw, 88px);
+    }
+
+    .pg-timeline {
+      position: relative;
+      max-width: 640px;
+      margin: 0 auto;
+      padding-left: 28px;
+    }
+
+    .pg-timeline::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 6px;
+      bottom: 6px;
+      width: 1px;
+      background: rgba(255,255,255,.14);
+    }
+
+    .pg-tl-item {
+      position: relative;
+      padding-bottom: clamp(30px, 5vw, 44px);
+    }
+
+    .pg-tl-item:last-child { padding-bottom: 0; }
+
+    .pg-tl-item::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 5px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #050505;
+      border: 1px solid rgba(255,255,255,.4);
+    }
+
+    .pg-tl-item.is-active::before {
+      background: #fff;
+      border-color: #fff;
+    }
+
+    .pg-tl-when {
+      font-family: var(--util);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      margin-bottom: 6px;
+    }
+
+    .pg-tl-item.is-active .pg-tl-when {
+      color: rgba(255,255,255,.75);
+    }
+
+    .pg-tl-title {
+      font-family: var(--display);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 700;
+      font-variation-settings: 'wdth' 112, 'wght' 700;
+      letter-spacing: -.01em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .pg-tl-p {
+      font-family: var(--body);
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(255,255,255,.62);
+    }
+  </style>
+</head>
+<body class="ink pg">
+
+  <header class="pg-header">
+    <a href="/" class="pg-close" aria-label="Back to home">×</a>
+    <a href="/" class="pg-brand" aria-label="LASTGAZE home">
+      <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+    </a>
+    <div class="pg-header-right"></div>
+  </header>
+
+  <main class="pg-main">
+
+    <h1 class="pg-h1">Next Drop</h1>
+    <p class="pg-lead">
+      Eight one-of-one pieces. No restocks. Here's exactly when the next drop opens
+      and what happens between now and then.
+    </p>
+
+    <span class="lab dim pg-drop-label" data-drop-label>Drop —</span>
+    <div class="count pg-count" data-count>
+      <div><strong>00</strong><span class="lab dim">Days</span></div>
+      <div><strong>00</strong><span class="lab dim">Hrs</span></div>
+      <div><strong>00</strong><span class="lab dim">Min</span></div>
+      <div><strong>00</strong><span class="lab dim">Sec</span></div>
+    </div>
+
+    <div class="pg-cta">
+      <a href="/shop/" class="btn solid" data-shop-link><span>Go to shop</span></a>
+    </div>
+
+    <hr class="pg-rule">
+
+    <div class="pg-section">
+      <h2 class="pg-h2">How we get there</h2>
+      <div class="pg-timeline">
+        <div class="pg-tl-item">
+          <div class="pg-tl-when">Mon — Thu</div>
+          <div class="pg-tl-title">Sourcing &amp; grading</div>
+          <p class="pg-tl-p">Pieces are found across Delhi, inspected by hand, and graded honestly —
+            nothing rounds up.</p>
+        </div>
+        <div class="pg-tl-item">
+          <div class="pg-tl-when">Friday</div>
+          <div class="pg-tl-title">Measured &amp; photographed</div>
+          <p class="pg-tl-p">Every lot is measured in inches and shot before it's ever listed. See
+            <a href="/how-drops-work/">how drops work</a> for the full process.</p>
+        </div>
+        <div class="pg-tl-item is-active" data-drop-day>
+          <div class="pg-tl-when" data-drop-when>Saturday, 8:00 PM IST</div>
+          <div class="pg-tl-title">Drop opens</div>
+          <p class="pg-tl-p">Eight pieces go live. First-come, no waitlist — once a size is gone,
+            it's gone.</p>
+        </div>
+        <div class="pg-tl-item">
+          <div class="pg-tl-when">After sale</div>
+          <div class="pg-tl-title">Into the archive</div>
+          <p class="pg-tl-p">Sold pieces move to <a href="/archive/">the archive</a> and stay listed
+            permanently.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-section">
+      <h2 class="pg-h2">Don't want to watch the clock?</h2>
+      <p class="pg-p">
+        <a href="/signup/">Sign up for updates</a> and we'll send a note right before each drop
+        opens, not after.
+      </p>
+    </div>
+
+  </main>
+
+  <script src="/assets/products.js"></script>
+  <script>
+    (function () {
+      var drop = window.LASTGAZE_DROP;
+      if (!drop) return;
+
+      var label = document.querySelector('[data-drop-label]');
+      if (label && drop.number) label.textContent = 'Drop ' + String(drop.number).padStart(3, '0');
+
+      var end = new Date(drop.opensAt).getTime();
+      var whenEl = document.querySelector('[data-drop-when]');
+      if (whenEl && !isNaN(end)) {
+        whenEl.textContent = new Date(end).toLocaleString('en-IN', {
+          weekday: 'long', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
+        });
+      }
+
+      var box = document.querySelector('[data-count]');
+      var pad = function (n) { return String(n).padStart(2, '0'); };
+
+      function tick() {
+        var d = end - Date.now();
+        if (d <= 0) {
+          location.href = '/shop/';
+          return;
+        }
+        var s = Math.floor(d / 1000);
+        var strongs = box.querySelectorAll('strong');
+        strongs[0].textContent = pad(Math.floor(s / 86400));
+        strongs[1].textContent = pad(Math.floor(s / 3600) % 24);
+        strongs[2].textContent = pad(Math.floor(s / 60) % 60);
+        strongs[3].textContent = pad(s % 60);
+      }
+
+      if (box && !isNaN(end)) {
+        tick();
+        setInterval(tick, 1000);
+      }
+    })();
+  </script>
+</body>
+</html>

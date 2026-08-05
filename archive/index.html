@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>The Archive — LASTGAZE Vintage Archive, India</title>
+  <meta name="description" content="The LASTGAZE archive: a permanent public record of every one-of-one vintage piece that has ever sold. Nothing is removed once it's here.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://lastgaze.com/archive/">
+  <meta name="theme-color" content="#000">
+  <link rel="icon" href="/assets/lastgaze-mark.svg">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LASTGAZE">
+  <meta property="og:url" content="https://lastgaze.com/archive/">
+  <meta property="og:title" content="The Archive — LASTGAZE Vintage Archive, India">
+  <meta property="og:description" content="The LASTGAZE archive: a permanent public record of every one-of-one vintage piece that has ever sold. Nothing is removed once it's here.">
+  <meta property="og:image" content="https://lastgaze.com/assets/og/lastgaze-og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_IN">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Archive — LASTGAZE Vintage Archive, India">
+  <meta name="twitter:description" content="The LASTGAZE archive: a permanent public record of every one-of-one vintage piece that has ever sold. Nothing is removed once it's here.">
+  <meta name="twitter:image" content="https://lastgaze.com/assets/og/lastgaze-og.jpg">
+
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <style>
+    .ar-list {
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .ar-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 16px;
+      align-items: baseline;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .ar-lot {
+      font-family: var(--util);
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.35);
+    }
+    .ar-info { min-width: 0; }
+    .ar-name {
+      font-family: var(--display);
+      font-size: clamp(14px, 1.8vw, 16px);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+      color: #fff;
+      margin: 0 0 4px;
+    }
+    .ar-meta {
+      font-family: var(--body);
+      font-size: 13px;
+      color: rgba(255,255,255,.45);
+    }
+    .ar-price {
+      font-family: var(--util);
+      font-size: 12px;
+      letter-spacing: .06em;
+      color: rgba(255,255,255,.55);
+      white-space: nowrap;
+    }
+    .ar-empty {
+      font-family: var(--body);
+      font-size: 15px;
+      color: rgba(255,255,255,.45);
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+  </style>
+</head>
+<body class="ink pg">
+
+  <header class="pg-header">
+    <a href="/" class="pg-close" aria-label="Back to home">×</a>
+    <a href="/" class="pg-brand" aria-label="LASTGAZE home">
+      <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+    </a>
+    <div class="pg-header-right"></div>
+  </header>
+
+  <main class="pg-main">
+
+    <h1 class="pg-h1">The Archive</h1>
+
+    <p class="pg-lead">
+      A vintage archive is only as good as its record-keeping. Every one-of-one piece that has ever
+      sold through LASTGAZE stays listed here, permanently — nothing gets quietly deleted once it's
+      gone.
+    </p>
+
+    <hr class="pg-rule">
+
+    <div class="pg-section">
+      <h2 class="pg-h2">Why we keep this page</h2>
+      <p class="pg-p">
+        Most vintage stores in India show you what's for sale and nothing else — once a piece sells,
+        it vanishes without a trace. We think the sold history is part of the point. It shows what
+        we actually source, drop after drop, not just what happens to be in stock this week.
+      </p>
+    </div>
+
+    <div class="pg-section" id="archive-section">
+      <h2 class="pg-h2">Sold lots</h2>
+      <div class="ar-list" id="archive-list"></div>
+    </div>
+
+  </main>
+
+  <script src="/assets/products.js"></script>
+  <script>
+    (function () {
+      var list = document.getElementById('archive-list');
+      var products = (window.LASTGAZE_PRODUCTS || []).filter(function (p) { return p.sold; });
+
+      if (!products.length) {
+        list.innerHTML = '<p class="ar-empty">' +
+          'No pieces have sold through yet — the archive fills in automatically as each drop closes. ' +
+          'Check back after Saturday, or see what\'s live right now in the <a href="/shop/" style="color:rgba(255,255,255,.75);text-decoration:underline;text-underline-offset:3px;">shop</a>.' +
+          '</p>';
+        return;
+      }
+
+      var fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+      list.innerHTML = products.map(function (p) {
+        return '<div class="ar-row">' +
+          '<div class="ar-lot">LOT ' + p.lot + '</div>' +
+          '<div class="ar-info">' +
+            '<p class="ar-name">' + p.name + '</p>' +
+            '<p class="ar-meta">' + p.era + ' &middot; Size ' + p.size + '</p>' +
+          '</div>' +
+          '<div class="ar-price">' + fmt.format(p.price) + '</div>' +
+        '</div>';
+      }).join('');
+    })();
+  </script>
+
+</body>
+</html>
