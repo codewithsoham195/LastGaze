@@ -66,8 +66,8 @@ window.LASTGAZE_PRODUCTS = [
     price: 1,
     size: "M",
     sold: false,
-    image: "",
-    images: [],
+    image: "/img/products/demo-tee-01.jpg",
+    images: ["/img/products/demo-tee-01.jpg"],
     condition: "This is a ₹1 test listing used to verify the checkout and admin order flow. Not a real product.",
     measure: "N/A"
   }
