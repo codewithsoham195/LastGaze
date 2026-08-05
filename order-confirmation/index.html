@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Order confirmed — LASTGAZE</title>
+  <meta name="description" content="Your LASTGAZE order confirmation.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <link rel="canonical" href="https://lastgaze.com/order-confirmation/">
+  <meta name="theme-color" content="#000">
+  <link rel="icon" href="/assets/lastgaze-mark.svg">
+  <script>try{if(sessionStorage.getItem('lg_open')!=='1')location.replace('/password/')}catch(e){location.replace('/password/')}</script>
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <style>
+    .oc-ref {
+      text-align: center;
+      margin: 0 0 clamp(48px, 8vw, 80px);
+    }
+    .oc-ref-id {
+      font-family: var(--util);
+      font-size: 12px;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 6px;
+    }
+    .oc-ref-date {
+      font-family: var(--util);
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.32);
+    }
+    .oc-item-card {
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 18px;
+      margin-bottom: 14px;
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+    .oc-item-frame {
+      width: 72px;
+      height: 92px;
+      background: rgba(255,255,255,.05);
+      overflow: hidden;
+    }
+    .oc-item-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .oc-item-frame-empty {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      font-family: var(--util);
+      font-size: 8.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      text-align: center;
+      padding: 4px;
+    }
+    .oc-item-name {
+      font-family: var(--body);
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .oc-item-meta {
+      font-family: var(--util);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+    }
+    .oc-item-price {
+      font-family: var(--body);
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .oc-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 18px;
+      margin-bottom: clamp(40px, 7vw, 64px);
+    }
+    .oc-total-label {
+      font-family: var(--util);
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+    }
+    .oc-total-amount {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      font-variation-settings: 'wdth' 112, 'wght' 700;
+      color: #fff;
+    }
+    .oc-actions {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .oc-empty-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="ink pg">
+
+  <header class="pg-header">
+    <div class="pg-header-left">
+      <a href="/" class="pg-close" aria-label="Back to home">×</a>
+    </div>
+    <a href="/" class="pg-brand" aria-label="LASTGAZE home">
+      <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+    </a>
+    <div class="pg-header-right"></div>
+  </header>
+
+  <main class="pg-main">
+
+    <div id="ocFound">
+      <h1 class="pg-h1">Piece secured.</h1>
+      <p class="pg-lead">We've got your order and payment. It'll be packed by hand and dispatched within 48 hours. Questions in the meantime? <a href="mailto:l4stgaze@gmail.com">l4stgaze@gmail.com</a>.</p>
+
+      <div class="oc-ref">
+        <div class="oc-ref-id" id="ocPaymentId"></div>
+        <div class="oc-ref-date" id="ocDate"></div>
+      </div>
+
+      <div class="pg-section">
+        <h2 class="pg-h2">Items</h2>
+        <div id="ocItems"></div>
+        <div class="oc-total">
+          <span class="oc-total-label">Total paid</span>
+          <span class="oc-total-amount" id="ocTotal"></span>
+        </div>
+      </div>
+
+      <div class="pg-section">
+        <h2 class="pg-h2">Shipping to</h2>
+        <div class="pg-address-card">
+          <div class="pg-address-card__body" id="ocAddress" style="margin-bottom:0"></div>
+        </div>
+      </div>
+
+      <p class="pg-p" style="text-align:center;font-size:13px;color:rgba(255,255,255,.45)">
+        Dispatched from New Delhi within 48 hours. Shipping across India takes 3–5 days, fully tracked.
+        As every piece is a one-of-one, all sales are final — but reach out within 48 hours of delivery
+        if there's an issue, and we'll make it right.
+      </p>
+
+      <div class="oc-actions">
+        <a href="/shop/" class="pg-btn" style="text-align:center;text-decoration:none;display:block">Continue shopping</a>
+      </div>
+    </div>
+
+    <div id="ocMissing" class="oc-empty-wrap" style="display:none">
+      <h1 class="pg-h1">Piece secured.</h1>
+      <p class="pg-lead">We couldn't find the details for this order in this browser session, but if your payment went through, it's already on our end.</p>
+      <p class="oc-ref-id" id="ocMissingPaymentId" style="text-align:center;margin-bottom:32px"></p>
+      <div class="oc-actions">
+        <a href="/shop/" class="pg-btn" style="text-align:center;text-decoration:none;display:block">Continue shopping</a>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/assets/products.js"></script>
+  <script>
+    (function () {
+      function inr(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+      function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      var params = new URLSearchParams(location.search);
+      var paidId = params.get('paid') || '';
+
+      var order = null;
+      try { order = JSON.parse(sessionStorage.getItem('lg_last_order') || 'null'); } catch (e) { }
+
+      // Only trust the stored order if it matches the payment id in the
+      // URL — guards against a stale order from an earlier purchase this
+      // session showing up if someone revisits an old confirmation link.
+      if (order && paidId && order.payment_id !== paidId) order = null;
+
+      var foundEl = document.getElementById('ocFound');
+      var missingEl = document.getElementById('ocMissing');
+
+      if (!order) {
+        foundEl.style.display = 'none';
+        missingEl.style.display = 'block';
+        document.getElementById('ocMissingPaymentId').textContent = paidId ? 'Payment reference: ' + paidId : '';
+        return;
+      }
+
+      var products = window.LASTGAZE_PRODUCTS || [];
+      function findProduct(lot) {
+        return products.filter(function (p) { return p.lot === lot; })[0];
+      }
+
+      document.getElementById('ocPaymentId').textContent = 'Order ref ' + (order.payment_id || paidId);
+      document.getElementById('ocDate').textContent = order.placed_at
+        ? new Date(order.placed_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+        : '';
+
+      var items = order.items || [];
+      document.getElementById('ocItems').innerHTML = items.map(function (item) {
+        var p = findProduct(item.lot) || {};
+        var img = p.image || (p.images && p.images[0]) || '';
+        var thumb = img
+          ? '<img src="' + img + '" alt="' + escapeHtml(item.name) + '">'
+          : '<div class="oc-item-frame-empty">Lot ' + escapeHtml(item.lot) + '</div>';
+        return '' +
+          '<div class="oc-item-card">' +
+          '<div class="oc-item-frame">' + thumb + '</div>' +
+          '<div>' +
+          '<div class="oc-item-name">' + escapeHtml(item.name) + '</div>' +
+          '<div class="oc-item-meta">Lot ' + escapeHtml(item.lot) + (item.size ? ' · Size ' + escapeHtml(item.size) : '') + '</div>' +
+          '</div>' +
+          '<div class="oc-item-price">' + inr(item.price) + '</div>' +
+          '</div>';
+      }).join('');
+
+      document.getElementById('ocTotal').textContent = inr(order.amount);
+
+      var s = order.shipping || {};
+      var addrLines = [s.name, s.phone, s.email, s.line1, s.line2, [s.city, s.state, s.postal_code].filter(Boolean).join(', ')].filter(Boolean);
+      document.getElementById('ocAddress').innerHTML = addrLines.map(escapeHtml).join('<br>');
+    })();
+  </script>
+</body>
+</html>

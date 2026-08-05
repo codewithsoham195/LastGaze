@@ -108,8 +108,17 @@ window.LG_PAY = function (cart) {
       theme: { color: LG_CONFIG.color, backdrop_color: "#050505" },
       notes: { lots: lots },
       handler: function (res) {
+        try {
+          sessionStorage.setItem('lg_last_order', JSON.stringify({
+            payment_id: res.razorpay_payment_id,
+            items: cart.items,
+            amount: amount,
+            shipping: shipping,
+            placed_at: new Date().toISOString()
+          }));
+        } catch (e) { }
         try { sessionStorage.removeItem('lg_cart'); } catch (e) { }
-        var redirect = function () { location.href = "/?paid=" + res.razorpay_payment_id; };
+        var redirect = function () { location.href = "/order-confirmation/?paid=" + res.razorpay_payment_id; };
         if (!LG_CONFIG.orderEndpoint) return redirect();
         // Tell the worker to independently verify this payment with
         // Razorpay, mark the lot(s) sold, and record the shipping
