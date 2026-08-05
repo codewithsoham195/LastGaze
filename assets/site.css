@@ -1837,6 +1837,7 @@ body.menu-open {
 .pdp {
     display: grid;
     grid-template-columns: 1fr;
+    align-items: start;
     gap: clamp(28px, 5vw, 56px);
     padding-top: 76px
 }
