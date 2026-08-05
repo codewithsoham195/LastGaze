@@ -223,7 +223,12 @@
     }
 
     var checkoutBtn = info.querySelector('[data-checkout]');
-    if (checkoutBtn) checkoutBtn.addEventListener('click', window.LG_CHECKOUT);
+    if (checkoutBtn && !unavailable) {
+      checkoutBtn.addEventListener('click', function () {
+        Cart.add(p, p.size); // no-op if it's already in the bag
+        window.LG_CHECKOUT();
+      });
+    }
   }
 
   /* ---------- 7. checkout ---------------------------------------- */
