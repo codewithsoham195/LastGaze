@@ -32,9 +32,9 @@
 
   <header class="pg-header">
     <a href="/" class="pg-close" aria-label="Back to home">×</a>
-    <a href="/" class="pg-brand" aria-label="LASTGAZE home">
+    <span class="pg-brand" aria-label="LASTGAZE">
       <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
-    </a>
+    </span>
     <div class="pg-header-right"></div>
   </header>
 
@@ -64,6 +64,13 @@
   </main>
 
   <script>
+    /* Set after deploying the Apps Script Web App —
+       see google-apps-script/README.md for setup steps. */
+    var LG_SIGNUP_CONFIG = {
+      endpoint: ""
+    };
+  </script>
+  <script>
     (function () {
       var form = document.getElementById('signup-form');
       var msg  = document.getElementById('signup-msg');
@@ -75,6 +82,20 @@
           msg.textContent = 'Please enter a valid email.';
           return;
         }
+
+        if (LG_SIGNUP_CONFIG.endpoint) {
+          var body = new URLSearchParams();
+          body.set('email', email);
+          // Apps Script Web Apps don't send CORS headers, so the response
+          // can't be read from the browser — fire the request and treat
+          // it as sent (no-cors mode) rather than waiting on it.
+          fetch(LG_SIGNUP_CONFIG.endpoint, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: body
+          }).catch(function () { /* offline etc — still show success below */ });
+        }
+
         form.querySelector('input').value = '';
         msg.textContent = 'You\'re in. We\'ll be in touch.';
         form.querySelector('button').disabled = true;
