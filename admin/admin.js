@@ -58,6 +58,15 @@ var LG_ADMIN_CONFIG = {
     return '₹' + Math.round((paise || 0) / 100).toLocaleString('en-IN');
   }
 
+  function formatDateTime(raw) {
+    if (!raw) return '';
+    var d = new Date(raw.replace(' ', 'T') + 'Z');
+    if (isNaN(d.getTime())) return raw;
+    var datePart = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    var timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    return datePart + ', ' + timePart;
+  }
+
   function fetchOrders(password) {
     return fetch(LG_ADMIN_CONFIG.apiBase.replace(/\/$/, '') + '/admin/orders', {
       headers: { 'X-Admin-Password': password }
@@ -91,7 +100,7 @@ var LG_ADMIN_CONFIG = {
         '<div class="adm-msg">' +
         '<div class="adm-msg-top">' +
         '<span class="adm-msg-from">' + escapeHtml(m.name) + ' · <a href="mailto:' + escapeHtml(m.email) + '">' + escapeHtml(m.email) + '</a></span>' +
-        '<span class="adm-msg-date">' + escapeHtml((m.created_at || '').replace('T', ' ').slice(0, 16)) + '</span>' +
+        '<span class="adm-msg-date">' + escapeHtml(formatDateTime(m.created_at)) + '</span>' +
         '</div>' +
         (m.subject ? '<div class="adm-msg-subject">' + escapeHtml(m.subject) + '</div>' : '') +
         '<div class="adm-msg-body">' + escapeHtml(m.message) + '</div>' +
@@ -126,7 +135,7 @@ var LG_ADMIN_CONFIG = {
         '<div class="adm-order-top">' +
         '<span class="adm-order-lots">Lot ' + escapeHtml(o.lots) + '</span>' +
         '<span class="adm-order-amount">' + inr(o.amount) + '</span>' +
-        '<span class="adm-order-date">' + escapeHtml((o.created_at || '').replace('T', ' ').slice(0, 16)) + '</span>' +
+        '<span class="adm-order-date">' + escapeHtml(formatDateTime(o.created_at)) + '</span>' +
         '</div>' +
         '<div class="adm-order-body">' + escapeHtml(addr) + '</div>' +
         '<div class="adm-order-actions">' +
