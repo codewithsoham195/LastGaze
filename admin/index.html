@@ -34,10 +34,14 @@
     .adm-count { font-family: var(--util); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(5,5,5,.5); }
     .adm-search { flex: 1 1 220px; max-width: 320px; }
     .adm-order { border: 1px solid rgba(5,5,5,.14); padding: 20px 22px; margin-bottom: 14px; }
-    .adm-order-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; }
+    .adm-order-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; }
     .adm-order-lots { font-family: var(--util); font-size: 12px; letter-spacing: .06em; color: #050505; }
+    .adm-order-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .adm-order-amount { font-family: var(--util); font-size: 12px; color: rgba(5,5,5,.7); }
     .adm-order-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.4); }
+    .adm-fulfill-btn { background: transparent; border: 1px solid rgba(5,5,5,.3); color: #050505; padding: 6px 14px; font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+    .adm-fulfill-btn:hover { border-color: #050505; background: #050505; color: #fff; }
+    .adm-fulfill-btn:disabled { opacity: .5; cursor: not-allowed; }
     .adm-order-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(5,5,5,.85); white-space: pre-line; margin-bottom: 12px; }
     .adm-order-actions { display: flex; gap: 16px; }
     .adm-order-actions button { background: transparent; border: 0; color: rgba(5,5,5,.5); font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0; }

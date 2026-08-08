@@ -140,13 +140,15 @@ var LG_ADMIN_CONFIG = {
         '<div class="adm-order" data-payment-id="' + escapeHtml(o.payment_id) + '">' +
         '<div class="adm-order-top">' +
         '<span class="adm-order-lots">Lot ' + escapeHtml(o.lots) + '</span>' +
+        '<div class="adm-order-top-right">' +
         '<span class="adm-order-amount">' + inr(o.amount) + '</span>' +
         '<span class="adm-order-date">' + escapeHtml(formatDateTime(o.created_at)) + '</span>' +
+        '<button type="button" class="adm-fulfill-btn" data-fulfill>Order shipped</button>' +
+        '</div>' +
         '</div>' +
         '<div class="adm-order-body">' + escapeHtml(addr) + '</div>' +
         '<div class="adm-order-actions">' +
         '<button type="button" data-copy>Copy address</button>' +
-        '<button type="button" data-fulfill>Order shipped</button>' +
         '<span class="pg-header-email">' + escapeHtml(o.payment_id) + '</span>' +
         '</div>' +
         '</div>';
