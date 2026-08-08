@@ -14,7 +14,7 @@
 
 window.LASTGAZE_DROP = {
   number: 1,                     // Drop 001
-  opensAt: "2026-08-08T20:00:00+05:30",  // next Saturday 8PM IST
+  opensAt: "2026-08-15T09:00:00+05:30",  // Saturday, 15 Aug 2026, 9AM IST
   password: "lastgaze"           // change this every drop
 };
 
