@@ -49,15 +49,17 @@ tab) — never written to disk or synced anywhere.
 
 ## What shows up in Orders
 
-Every order placed **after** that feature shipped, that you haven't marked
-shipped yet. Older payments confirmed before the shipping form existed won't
-have a row here, since no address was ever collected for them — nothing to
-backfill.
+The **Pending** toggle (default view) shows every order placed **after**
+the shipping form shipped, that you haven't marked shipped yet. Older
+payments confirmed before the shipping form existed won't have a row here,
+since no address was ever collected for them — nothing to backfill.
 
 Click **Order shipped** on a card once you've packed and sent it — that
-marks it fulfilled and drops it off this list for good (it isn't shown
-anywhere else in the admin page). This needs `orders-add-fulfilled.sql` run
-against the D1 database once — see `cloudflare-worker/README.md`.
+marks it fulfilled and moves it off Pending. Switch to the **Shipped**
+toggle to see order history — every fulfilled order, newest first, with the
+date it was marked shipped instead of the action button. This needs
+`orders-add-fulfilled.sql` run against the D1 database once — see
+`cloudflare-worker/README.md`.
 
 ## Reviews aren't managed here
 

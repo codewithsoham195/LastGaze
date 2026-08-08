@@ -31,8 +31,13 @@
     .pg-form-msg { color: rgba(5,5,5,.5); }
 
     .adm-toolbar { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 26px; }
+    .adm-toolbar-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
     .adm-count { font-family: var(--util); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(5,5,5,.5); }
     .adm-search { flex: 1 1 220px; max-width: 320px; }
+    .adm-order-filter { display: flex; gap: 8px; }
+    .adm-order-filter-btn { background: transparent; border: 1px solid rgba(5,5,5,.2); color: rgba(5,5,5,.55); padding: 7px 14px; font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+    .adm-order-filter-btn.is-active { border-color: #050505; color: #050505; }
+    .adm-order-shipped-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.4); }
     .adm-order { border: 1px solid rgba(5,5,5,.14); padding: 20px 22px; margin-bottom: 14px; }
     .adm-order-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; }
     .adm-order-lots { font-family: var(--util); font-size: 12px; letter-spacing: .06em; color: #050505; }
@@ -128,7 +133,13 @@
 
       <div id="admin-orders-panel">
         <div class="adm-toolbar">
-          <span class="adm-count" id="admin-order-count"></span>
+          <div class="adm-toolbar-left">
+            <div class="adm-order-filter">
+              <button type="button" class="adm-order-filter-btn is-active" data-order-filter="pending">Pending</button>
+              <button type="button" class="adm-order-filter-btn" data-order-filter="shipped">Shipped</button>
+            </div>
+            <span class="adm-count" id="admin-order-count"></span>
+          </div>
           <input class="pg-input adm-search" type="search" id="admin-search" placeholder="Search by name, lot, phone, city…">
         </div>
         <div id="admin-order-list"></div>

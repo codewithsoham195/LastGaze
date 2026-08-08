@@ -34,6 +34,8 @@ var LG_ADMIN_CONFIG = {
 
   var allOrders = [];
   var allMessages = [];
+  var orderFilter = 'pending';
+  var orderFilterBtns = document.querySelectorAll('[data-order-filter]');
 
   var TAB_PANELS = { orders: ordersPanel, messages: messagesPanel, products: productsPanel };
 
@@ -73,8 +75,8 @@ var LG_ADMIN_CONFIG = {
     return datePart + ', ' + timePart;
   }
 
-  function fetchOrders(password) {
-    return fetch(LG_ADMIN_CONFIG.apiBase.replace(/\/$/, '') + '/admin/orders', {
+  function fetchOrders(password, status) {
+    return fetch(LG_ADMIN_CONFIG.apiBase.replace(/\/$/, '') + '/admin/orders?status=' + encodeURIComponent(status || 'pending'), {
       headers: { 'X-Admin-Password': password }
     }).then(function (res) {
       if (res.status === 401) throw new Error('Wrong password.');
@@ -136,6 +138,9 @@ var LG_ADMIN_CONFIG = {
 
     orderList.innerHTML = filtered.map(function (o) {
       var addr = addressBlock(o);
+      var rightAction = orderFilter === 'shipped'
+        ? '<span class="adm-order-shipped-date">Shipped ' + escapeHtml(formatDateTime(o.fulfilled_at)) + '</span>'
+        : '<button type="button" class="adm-fulfill-btn" data-fulfill>Order shipped</button>';
       return '' +
         '<div class="adm-order" data-payment-id="' + escapeHtml(o.payment_id) + '">' +
         '<div class="adm-order-top">' +
@@ -143,7 +148,7 @@ var LG_ADMIN_CONFIG = {
         '<div class="adm-order-top-right">' +
         '<span class="adm-order-amount">' + inr(o.amount) + '</span>' +
         '<span class="adm-order-date">' + escapeHtml(formatDateTime(o.created_at)) + '</span>' +
-        '<button type="button" class="adm-fulfill-btn" data-fulfill>Order shipped</button>' +
+        rightAction +
         '</div>' +
         '</div>' +
         '<div class="adm-order-body">' + escapeHtml(addr) + '</div>' +
@@ -204,7 +209,7 @@ var LG_ADMIN_CONFIG = {
   }
 
   function load(password) {
-    return fetchOrders(password).then(function (data) {
+    return fetchOrders(password, orderFilter).then(function (data) {
       sessionStorage.setItem(PW_KEY, password);
       allOrders = data.orders || [];
       showOrders();
@@ -217,6 +222,21 @@ var LG_ADMIN_CONFIG = {
       }).catch(function () { });
     });
   }
+
+  orderFilterBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.dataset.orderFilter === orderFilter) return;
+      orderFilter = btn.dataset.orderFilter;
+      orderFilterBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      orderList.innerHTML = '<p class="adm-empty">Loading…</p>';
+      fetchOrders(getPassword(), orderFilter).then(function (data) {
+        allOrders = data.orders || [];
+        renderOrders(searchInput.value);
+      }).catch(function (err) {
+        orderList.innerHTML = '<p class="adm-empty">' + escapeHtml(err.message) + '</p>';
+      });
+    });
+  });
 
   loginForm.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -231,6 +251,8 @@ var LG_ADMIN_CONFIG = {
     sessionStorage.removeItem(PW_KEY);
     allOrders = [];
     allMessages = [];
+    orderFilter = 'pending';
+    orderFilterBtns.forEach(function (b) { b.classList.toggle('is-active', b.dataset.orderFilter === 'pending'); });
     showLogin('');
   });
 

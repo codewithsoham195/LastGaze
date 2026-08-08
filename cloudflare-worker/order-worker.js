@@ -224,17 +224,18 @@ function checkAdminAuth(request, env) {
   return Boolean(expected) && provided === expected;
 }
 
-async function adminOrders(request, env, headers) {
+async function adminOrders(request, env, headers, status) {
   if (!checkAdminAuth(request, env)) {
     return json({ error: "Unauthorized" }, 401, headers);
   }
-  // Only unshipped orders — clicking "Order shipped" in the admin page
-  // marks fulfilled_at and drops it from this list for good, so the
-  // Orders tab only ever shows what still needs to go out.
-  const { results } = await env.DB.prepare(
-    "SELECT payment_id, order_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code, created_at " +
-    "FROM orders WHERE fulfilled_at IS NULL ORDER BY created_at DESC"
-  ).all();
+  // Default view is "pending" — only unshipped orders, so the Orders tab
+  // stays focused on what still needs to go out. ?status=shipped is the
+  // history view: everything already marked fulfilled, newest first.
+  const cols = "payment_id, order_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code, created_at, fulfilled_at";
+  const query = status === "shipped"
+    ? "SELECT " + cols + " FROM orders WHERE fulfilled_at IS NOT NULL ORDER BY fulfilled_at DESC"
+    : "SELECT " + cols + " FROM orders WHERE fulfilled_at IS NULL ORDER BY created_at DESC";
+  const { results } = await env.DB.prepare(query).all();
   return json({ orders: results }, 200, headers);
 }
 
@@ -700,7 +701,7 @@ export default {
         return await soldLots(env, headers);
       }
       if (url.pathname === "/admin/orders" && request.method === "GET") {
-        return await adminOrders(request, env, headers);
+        return await adminOrders(request, env, headers, url.searchParams.get("status"));
       }
       const fulfillMatch = url.pathname.match(/^\/admin\/orders\/([^/]+)\/fulfill$/);
       if (fulfillMatch && request.method === "PATCH") {
