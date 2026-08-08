@@ -25,6 +25,7 @@
   <meta name="twitter:title" content="LASTGAZE — Shop all">
   <meta name="twitter:description" content="LASTGAZE shop archive. Empty for now — upload your products later.">
   <meta name="twitter:image" content="https://lastgaze.com/assets/og/shop-og.jpg">
+  <link rel="stylesheet" href="/css/menu-overlay.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 13px; }
@@ -417,16 +418,38 @@
 <body>
   <header>
     <div class="header-left">
-      <span class="header-menu">Menu</span>
+      <button type="button" class="header-menu menu-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="menu-overlay">Menu</button>
     </div>
     <span class="header-logo" aria-label="LASTGAZE">
       <img src="/brand/lastgaze-wordmark-black.svg" alt="LASTGAZE">
     </span>
     <div class="header-right">
       <a href="/bag/" class="cart-count">Bag<sup id="bagCount"></sup></a>
-      <a href="/account/">Account</a>
     </div>
   </header>
+
+  <div class="menu-overlay" id="menu-overlay" role="dialog" aria-modal="true" aria-label="Site navigation" aria-hidden="true" tabindex="-1">
+    <div class="menu-overlay__header">
+      <button class="menu-overlay__close" type="button" aria-label="Close menu">×</button>
+      <span class="menu-overlay__brand" aria-label="LASTGAZE">
+        <img src="/brand/lastgaze-wordmark-white.svg" alt="LASTGAZE">
+      </span>
+      <a href="/bag/" class="menu-overlay__bag" data-cart-count>Bag</a>
+    </div>
+    <div class="menu-overlay__content">
+      <nav class="menu-overlay__nav" aria-label="Main navigation">
+        <a href="/next-drop/">Next Drop</a>
+        <a href="/products/">Products</a>
+        <a href="/contact/">Contact Us</a>
+        <a href="/account/">Account</a>
+        <a href="/signup/">Sign Up</a>
+        <a href="/sustainability/">Sustainability</a>
+        <a href="/terms/">Terms &amp; Conditions</a>
+        <a href="/privacy/">Privacy Policy</a>
+        <a href="/cookies/">Cookie Policy</a>
+      </nav>
+    </div>
+  </div>
 
   <nav class="cat-nav">
     <ul>
@@ -576,5 +599,6 @@
       if (items.length) badge.textContent = items.length;
     })();
   </script>
+  <script src="/js/menu-overlay.js"></script>
 </body>
 </html>

@@ -66,6 +66,32 @@ body.menu-open {
   -webkit-backface-visibility: hidden;
 }
 
+.menu-overlay__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: .55;
+  filter: saturate(.85) contrast(1.05) brightness(.75);
+}
+
+.menu-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .55), rgba(0, 0, 0, .8));
+}
+
+.menu-overlay__header,
+.menu-overlay__content {
+  position: relative;
+  z-index: 1;
+}
+
 .menu-overlay.is-open {
   opacity: 1;
   visibility: visible;
@@ -166,6 +192,7 @@ body.menu-open {
 .menu-overlay.is-open .menu-overlay__nav a:nth-child(6) { transition-delay: 245ms; }
 .menu-overlay.is-open .menu-overlay__nav a:nth-child(7) { transition-delay: 285ms; }
 .menu-overlay.is-open .menu-overlay__nav a:nth-child(8) { transition-delay: 325ms; }
+.menu-overlay.is-open .menu-overlay__nav a:nth-child(9) { transition-delay: 365ms; }
 
 @media (max-width: 640px) {
   .menu-overlay {
