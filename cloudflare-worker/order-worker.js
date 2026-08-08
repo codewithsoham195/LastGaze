@@ -228,11 +228,26 @@ async function adminOrders(request, env, headers) {
   if (!checkAdminAuth(request, env)) {
     return json({ error: "Unauthorized" }, 401, headers);
   }
+  // Only unshipped orders — clicking "Order shipped" in the admin page
+  // marks fulfilled_at and drops it from this list for good, so the
+  // Orders tab only ever shows what still needs to go out.
   const { results } = await env.DB.prepare(
     "SELECT payment_id, order_id, lots, amount, name, phone, email, line1, line2, city, state, postal_code, created_at " +
-    "FROM orders ORDER BY created_at DESC"
+    "FROM orders WHERE fulfilled_at IS NULL ORDER BY created_at DESC"
   ).all();
   return json({ orders: results }, 200, headers);
+}
+
+async function adminFulfillOrder(request, env, headers, paymentId) {
+  if (!checkAdminAuth(request, env)) {
+    return json({ error: "Unauthorized" }, 401, headers);
+  }
+  const result = await env.DB.prepare(
+    "UPDATE orders SET fulfilled_at = datetime('now') WHERE payment_id = ? AND fulfilled_at IS NULL"
+  ).bind(paymentId).run();
+
+  if (!result.meta || !result.meta.changes) return json({ error: "Not found" }, 404, headers);
+  return json({ ok: true }, 200, headers);
 }
 
 function isValidEmail(email) {
@@ -578,6 +593,10 @@ export default {
       }
       if (url.pathname === "/admin/orders" && request.method === "GET") {
         return await adminOrders(request, env, headers);
+      }
+      const fulfillMatch = url.pathname.match(/^\/admin\/orders\/([^/]+)\/fulfill$/);
+      if (fulfillMatch && request.method === "PATCH") {
+        return await adminFulfillOrder(request, env, headers, decodeURIComponent(fulfillMatch[1]));
       }
       if (url.pathname === "/contact" && request.method === "POST") {
         return await submitMessage(request, env, headers);

@@ -146,6 +146,7 @@ var LG_ADMIN_CONFIG = {
         '<div class="adm-order-body">' + escapeHtml(addr) + '</div>' +
         '<div class="adm-order-actions">' +
         '<button type="button" data-copy>Copy address</button>' +
+        '<button type="button" data-fulfill>Order shipped</button>' +
         '<span class="pg-header-email">' + escapeHtml(o.payment_id) + '</span>' +
         '</div>' +
         '</div>';
@@ -160,6 +161,28 @@ var LG_ADMIN_CONFIG = {
           var original = btn.textContent;
           btn.textContent = 'Copied';
           setTimeout(function () { btn.textContent = original; }, 1200);
+        });
+      });
+    });
+
+    orderList.querySelectorAll('[data-fulfill]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.adm-order');
+        var paymentId = card.dataset.paymentId;
+        if (!confirm('Mark this order as shipped? It will drop off this list for good.')) return;
+        btn.disabled = true;
+        btn.textContent = 'Marking…';
+        fetch(LG_ADMIN_CONFIG.apiBase.replace(/\/$/, '') + '/admin/orders/' + encodeURIComponent(paymentId) + '/fulfill', {
+          method: 'PATCH',
+          headers: { 'X-Admin-Password': getPassword() }
+        }).then(function (res) {
+          if (!res.ok) throw new Error('Could not mark order shipped.');
+          allOrders = allOrders.filter(function (o) { return o.payment_id !== paymentId; });
+          renderOrders(searchInput.value);
+        }).catch(function (err) {
+          alert(err.message);
+          btn.disabled = false;
+          btn.textContent = 'Order shipped';
         });
       });
     });

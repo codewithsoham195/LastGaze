@@ -54,6 +54,8 @@ deployed URL.
    shop doesn't go blank the moment it switches to fetching from here). If
    you ran `orders-schema.sql` before it included the `user_id` column,
    also run `orders-add-user-id.sql` once — skip it on a brand new database.
+   Also run `orders-add-fulfilled.sql` once — it adds the `fulfilled_at`
+   column the admin page's "Order shipped" button needs.
 7. **Bindings** → **Add binding** → **R2 bucket**. Variable name:
    `PRODUCT_IMAGES`. Create a new bucket (e.g. `lastgaze-products`) if you
    don't have one — this is where photos uploaded from the admin Products
