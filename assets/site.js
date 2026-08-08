@@ -154,15 +154,16 @@
   function renderGrid() {
     var g = document.querySelector('[data-grid]');
     if (!g) return;
-    var list = window.LASTGAZE_PRODUCTS || [];
-    fetchSoldLots().then(function (soldLots) {
-      list.forEach(function (p) { if (soldLots.indexOf(p.lot) !== -1) p.sold = true; });
-      g.innerHTML = list.map(card).join('');
+    window.LG_PRODUCTS_READY.then(function (list) {
+      return fetchSoldLots().then(function (soldLots) {
+        list.forEach(function (p) { if (soldLots.indexOf(p.lot) !== -1) p.sold = true; });
+        g.innerHTML = list.map(card).join('');
 
-      var count = document.querySelector('[data-product-count]');
-      if (count) count.textContent = String(list.length);
+        var count = document.querySelector('[data-product-count]');
+        if (count) count.textContent = String(list.length);
 
-      reveals();
+        reveals();
+      });
     });
   }
 
@@ -171,13 +172,15 @@
     var root = document.querySelector('[data-pdp]');
     if (!root) return;
     var lot = new URLSearchParams(location.search).get('lot') || '001';
-    var all = window.LASTGAZE_PRODUCTS || [];
-    var p = all.filter(function (x) { return x.lot === lot; })[0] || all[0];
-    if (!p) return;
 
-    fetchSoldLots().then(function (soldLots) {
-      if (soldLots.indexOf(p.lot) !== -1) p.sold = true;
-      renderPDPContent(p, root);
+    window.LG_PRODUCTS_READY.then(function (all) {
+      var p = all.filter(function (x) { return x.lot === lot; })[0] || all[0];
+      if (!p) return;
+
+      return fetchSoldLots().then(function (soldLots) {
+        if (soldLots.indexOf(p.lot) !== -1) p.sold = true;
+        renderPDPContent(p, root);
+      });
     });
   }
 

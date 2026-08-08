@@ -213,8 +213,11 @@ var LG_ACCOUNT_CONFIG = {
   }
 
   function loadOrders() {
-    api('/account/orders', { method: 'GET' }).then(function (data) {
-      renderOrders(data.orders || []);
+    // findProduct() below reads window.LASTGAZE_PRODUCTS — wait for the
+    // catalog fetch alongside the orders fetch so it's populated by the
+    // time renderOrders() looks up each item's thumbnail.
+    Promise.all([api('/account/orders', { method: 'GET' }), window.LG_PRODUCTS_READY]).then(function (results) {
+      renderOrders(results[0].orders || []);
     }).catch(function () {
       ordersList.innerHTML = '<p class="pg-form-msg">Could not load orders.</p>';
     });

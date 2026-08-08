@@ -28,19 +28,25 @@ var LG_ADMIN_CONFIG = {
   var adminTabs = document.querySelectorAll('[data-admin-tab]');
   var ordersPanel = document.getElementById('admin-orders-panel');
   var messagesPanel = document.getElementById('admin-messages-panel');
+  var productsPanel = document.getElementById('admin-products-panel');
   var messageList = document.getElementById('admin-message-list');
   var messageCount = document.getElementById('admin-message-count');
 
   var allOrders = [];
   var allMessages = [];
 
+  var TAB_PANELS = { orders: ordersPanel, messages: messagesPanel, products: productsPanel };
+
   adminTabs.forEach(function (tab) {
     tab.addEventListener('click', function () {
       adminTabs.forEach(function (t) { t.classList.remove('is-active'); });
       tab.classList.add('is-active');
-      var isMessages = tab.dataset.adminTab === 'messages';
-      ordersPanel.style.display = isMessages ? 'none' : 'block';
-      messagesPanel.style.display = isMessages ? 'block' : 'none';
+      var active = tab.dataset.adminTab;
+      Object.keys(TAB_PANELS).forEach(function (name) {
+        if (!TAB_PANELS[name]) return;
+        TAB_PANELS[name].style.display = name === active ? 'block' : 'none';
+      });
+      document.dispatchEvent(new CustomEvent('lg-admin-tab', { detail: { tab: active } }));
     });
   });
 

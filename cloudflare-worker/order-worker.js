@@ -5,23 +5,24 @@
    sold only after independently verifying payment with Razorpay
    — never trusting the browser's own "payment succeeded" callback.
 
+   Also serves the product catalog: the admin Products tab reads
+   and writes it here, checkout prices lots from it (never a
+   hardcoded map), and the storefront's GET /products is the
+   public read the whole site now depends on instead of the old
+   static assets/products.js array.
+
    Deploy this on Cloudflare Workers. Set RAZORPAY_KEY_ID and
    RAZORPAY_KEY_SECRET as encrypted secrets on the worker —
    never write them into this file or commit them.
 
    Bind a D1 database as "DB" (same one the account worker uses)
-   — Settings -> Bindings — and run sold-lots-schema.sql against
-   it once, before relying on /confirm-payment or /sold-lots.
-   ============================================================ */
+   — Settings -> Bindings — and run sold-lots-schema.sql and
+   products-schema.sql against it once, before relying on
+   /confirm-payment, /sold-lots, /products, or /admin/products.
 
-// Authoritative prices, in rupees. Keep this in sync with
-// assets/products.js — this worker never trusts a price sent
-// by the browser.
-const PRICES = {
-  "009": 2000,
-  "010": 20000,
-  "999": 1 // TEMPORARY — checkout/admin test listing, remove once verified
-};
+   Bind an R2 bucket as "PRODUCT_IMAGES" — Settings -> Bindings —
+   for admin-uploaded product photos. See README for setup.
+   ============================================================ */
 
 const ALLOWED_ORIGINS = [
   "https://lastgaze.com",
@@ -31,7 +32,7 @@ const ALLOWED_ORIGINS = [
 function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password, Authorization",
     "Content-Type": "application/json"
   };
@@ -94,13 +95,17 @@ async function createOrder(request, env, headers) {
     return json({ error: "No items" }, 400, headers);
   }
 
+  // Prices are never trusted from the browser — always re-read from the
+  // live product catalog, and only for lots actually published live.
   let amount = 0;
   for (const item of items) {
-    const price = PRICES[item.lot];
-    if (price == null) {
+    const row = await env.DB.prepare(
+      "SELECT price FROM products WHERE lot = ? AND status = 'live'"
+    ).bind(String(item.lot)).first();
+    if (!row) {
       return json({ error: "Unknown lot: " + item.lot }, 400, headers);
     }
-    amount += price;
+    amount += row.price;
   }
 
   const rzRes = await fetch("https://api.razorpay.com/v1/orders", {
@@ -275,6 +280,279 @@ async function soldLots(env, headers) {
   return json({ lots: results.map(function (r) { return r.lot; }) }, 200, headers);
 }
 
+/* ---------------------------------------------------------------
+   Product catalog — backs the admin Products tab, GET /products
+   (the storefront's only source of product data), and createOrder's
+   price lookup above.
+   --------------------------------------------------------------- */
+
+function parseImages(raw) {
+  try {
+    const arr = JSON.parse(raw || "[]");
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+// Shape every storefront consumer already expects from the old static
+// assets/products.js array.
+function rowToPublicProduct(row) {
+  const images = parseImages(row.images);
+  return {
+    lot: row.lot,
+    name: row.name,
+    era: row.era || "",
+    cat: row.cat || "",
+    isNew: !!row.is_new,
+    sale: !!row.is_sale,
+    price: row.price,
+    size: row.size || "",
+    sold: !!row.sold,
+    comingSoon: !!row.coming_soon,
+    image: row.image || images[0] || "",
+    images: images,
+    condition: row.condition || "",
+    measure: row.measure || ""
+  };
+}
+
+function rowToAdminProduct(row) {
+  const pub = rowToPublicProduct(row);
+  pub.status = row.status;
+  pub.createdAt = row.created_at;
+  pub.updatedAt = row.updated_at;
+  return pub;
+}
+
+async function publicProducts(env, headers) {
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM products WHERE status = 'live' ORDER BY created_at DESC"
+  ).all();
+  return json({ products: results.map(rowToPublicProduct) }, 200, headers);
+}
+
+async function adminListProducts(request, env, headers) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM products ORDER BY created_at DESC"
+  ).all();
+  return json({ products: results.map(rowToAdminProduct) }, 200, headers);
+}
+
+// Pulls the fields a create/update body can set, falling back to an
+// existing row's values on update so a partial edit doesn't null out
+// the rest of the product.
+function readProductFields(body, existing) {
+  const b = body || {};
+  const pick = function (key, fallback) {
+    return b[key] != null ? b[key] : (existing ? existing[key] : fallback);
+  };
+  return {
+    name: String(pick("name", "") || "").trim(),
+    era: String(pick("era", "") || "").trim(),
+    cat: String(pick("cat", "") || "").trim(),
+    is_new: pick("isNew", existing ? existing.is_new : false) ? 1 : 0,
+    is_sale: pick("sale", existing ? existing.is_sale : false) ? 1 : 0,
+    price: Number(pick("price", NaN)),
+    size: String(pick("size", "") || "").trim(),
+    sold: pick("sold", existing ? existing.sold : false) ? 1 : 0,
+    coming_soon: pick("comingSoon", existing ? existing.coming_soon : false) ? 1 : 0,
+    image: String(pick("image", "") || "").trim(),
+    images: JSON.stringify(Array.isArray(b.images) ? b.images : (existing ? parseImages(existing.images) : [])),
+    condition: String(pick("condition", "") || "").trim(),
+    measure: String(pick("measure", "") || "").trim()
+  };
+}
+
+async function adminCreateProduct(request, env, headers) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return json({ error: "Invalid JSON" }, 400, headers);
+  }
+
+  const lot = String(body.lot || "").trim();
+  if (!lot) return json({ error: "Lot is required" }, 400, headers);
+
+  const f = readProductFields(body, null);
+  if (!f.name) return json({ error: "Name is required" }, 400, headers);
+  if (!Number.isFinite(f.price) || f.price < 0) return json({ error: "Valid price is required" }, 400, headers);
+
+  const status = body.publish ? "live" : "draft";
+
+  try {
+    await env.DB.prepare(
+      "INSERT INTO products (lot, name, era, cat, is_new, is_sale, price, size, sold, coming_soon, image, images, condition, measure, status, updated_at) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))"
+    ).bind(
+      lot, f.name, f.era, f.cat, f.is_new, f.is_sale, f.price, f.size, f.sold, f.coming_soon,
+      f.image, f.images, f.condition, f.measure, status
+    ).run();
+  } catch (e) {
+    return json({ error: "Lot " + lot + " already exists" }, 409, headers);
+  }
+
+  const row = await env.DB.prepare("SELECT * FROM products WHERE lot = ?").bind(lot).first();
+  return json({ product: rowToAdminProduct(row) }, 201, headers);
+}
+
+async function adminUpdateProduct(request, env, headers, lot) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+
+  const existing = await env.DB.prepare("SELECT * FROM products WHERE lot = ?").bind(lot).first();
+  if (!existing) return json({ error: "Not found" }, 404, headers);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return json({ error: "Invalid JSON" }, 400, headers);
+  }
+
+  const f = readProductFields(body, existing);
+  if (!f.name) return json({ error: "Name is required" }, 400, headers);
+  if (!Number.isFinite(f.price) || f.price < 0) return json({ error: "Valid price is required" }, 400, headers);
+
+  await env.DB.prepare(
+    "UPDATE products SET name=?, era=?, cat=?, is_new=?, is_sale=?, price=?, size=?, sold=?, coming_soon=?, image=?, images=?, condition=?, measure=?, updated_at=datetime('now') " +
+    "WHERE lot = ?"
+  ).bind(
+    f.name, f.era, f.cat, f.is_new, f.is_sale, f.price, f.size, f.sold, f.coming_soon,
+    f.image, f.images, f.condition, f.measure, lot
+  ).run();
+
+  const row = await env.DB.prepare("SELECT * FROM products WHERE lot = ?").bind(lot).first();
+  return json({ product: rowToAdminProduct(row) }, 200, headers);
+}
+
+// Best-effort R2 cleanup — a product row is the source of truth, so a
+// leftover orphaned image in R2 is a rounding error, not a bug worth
+// blocking the delete over.
+async function deleteProductImages(env, row) {
+  if (!env.PRODUCT_IMAGES || !row) return;
+  const images = parseImages(row.images);
+  const keys = images
+    .map(function (src) { return extractImageKey(src); })
+    .filter(Boolean);
+  for (const key of keys) {
+    try { await env.PRODUCT_IMAGES.delete(key); } catch (e) { /* ignore */ }
+  }
+}
+
+function extractImageKey(src) {
+  const marker = "/img-cdn/";
+  const i = String(src || "").indexOf(marker);
+  if (i === -1) return null;
+  return decodeURIComponent(src.slice(i + marker.length));
+}
+
+async function adminDeleteProduct(request, env, headers, lot) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+
+  const existing = await env.DB.prepare("SELECT * FROM products WHERE lot = ?").bind(lot).first();
+  if (!existing) return json({ error: "Not found" }, 404, headers);
+
+  await env.DB.prepare("DELETE FROM products WHERE lot = ?").bind(lot).run();
+  await deleteProductImages(env, existing);
+
+  return json({ ok: true }, 200, headers);
+}
+
+async function adminSetProductStatus(request, env, headers, lot) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return json({ error: "Invalid JSON" }, 400, headers);
+  }
+
+  const status = body.status === "live" ? "live" : "draft";
+  const result = await env.DB.prepare(
+    "UPDATE products SET status = ?, updated_at = datetime('now') WHERE lot = ?"
+  ).bind(status, lot).run();
+
+  if (!result.meta || !result.meta.changes) return json({ error: "Not found" }, 404, headers);
+  return json({ ok: true, status: status }, 200, headers);
+}
+
+// The admin Products tab's Publish button: flips every draft it's
+// showing to live in one shot, so "add a bunch of pieces, then
+// Publish" goes live as a single batch.
+async function adminPublishProducts(request, env, headers) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return json({ error: "Invalid JSON" }, 400, headers);
+  }
+
+  const lots = Array.isArray(body.lots) ? body.lots.map(String) : [];
+  if (!lots.length) return json({ error: "No lots to publish" }, 400, headers);
+
+  const placeholders = lots.map(function () { return "?"; }).join(", ");
+  await env.DB.prepare(
+    "UPDATE products SET status = 'live', updated_at = datetime('now') WHERE lot IN (" + placeholders + ")"
+  ).bind(...lots).run();
+
+  return json({ ok: true, published: lots }, 200, headers);
+}
+
+const IMAGE_EXT_BY_TYPE = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif"
+};
+
+function guessExtension(contentType, filename) {
+  const fromName = String(filename || "").match(/\.([a-zA-Z0-9]+)$/);
+  if (fromName) return fromName[1].toLowerCase();
+  return IMAGE_EXT_BY_TYPE[contentType] || "jpg";
+}
+
+async function uploadProductImage(request, env, headers, url) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+  if (!env.PRODUCT_IMAGES) return json({ error: "Image storage not configured" }, 500, headers);
+
+  const contentType = request.headers.get("Content-Type") || "application/octet-stream";
+  if (IMAGE_EXT_BY_TYPE[contentType] == null) {
+    return json({ error: "Unsupported image type: " + contentType }, 400, headers);
+  }
+
+  const filename = url.searchParams.get("filename") || "";
+  const ext = guessExtension(contentType, filename);
+  const key = "products/" + crypto.randomUUID() + "." + ext;
+
+  const bytes = await request.arrayBuffer();
+  await env.PRODUCT_IMAGES.put(key, bytes, { httpMetadata: { contentType: contentType } });
+
+  return json({ url: url.origin + "/img-cdn/" + key }, 201, headers);
+}
+
+// Public, unauthenticated — this is what <img> tags on the storefront
+// point at for anything uploaded through the admin page. Never routed
+// through corsHeaders()/json(): those force a JSON content type, which
+// would break every image.
+async function serveProductImage(env, key) {
+  if (!env.PRODUCT_IMAGES) return new Response("Not found", { status: 404 });
+  const obj = await env.PRODUCT_IMAGES.get(key);
+  if (!obj) return new Response("Not found", { status: 404 });
+  const headers = new Headers();
+  obj.writeHttpMetadata(headers);
+  headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  headers.set("ETag", obj.httpEtag);
+  return new Response(obj.body, { headers: headers });
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -283,6 +561,12 @@ export default {
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers });
+    }
+
+    // Images are served outside the try/json plumbing below — a missing
+    // photo should 404 as an image response, not a JSON error body.
+    if (url.pathname.indexOf("/img-cdn/") === 0 && request.method === "GET") {
+      return await serveProductImage(env, decodeURIComponent(url.pathname.slice("/img-cdn/".length)));
     }
 
     try {
@@ -301,6 +585,35 @@ export default {
       if (url.pathname === "/admin/messages" && request.method === "GET") {
         return await adminMessages(request, env, headers);
       }
+
+      // Product catalog — public read, admin-gated writes.
+      if (url.pathname === "/products" && request.method === "GET") {
+        return await publicProducts(env, headers);
+      }
+      if (url.pathname === "/admin/products" && request.method === "GET") {
+        return await adminListProducts(request, env, headers);
+      }
+      if (url.pathname === "/admin/products" && request.method === "POST") {
+        return await adminCreateProduct(request, env, headers);
+      }
+      if (url.pathname === "/admin/products/publish" && request.method === "POST") {
+        return await adminPublishProducts(request, env, headers);
+      }
+      if (url.pathname === "/admin/products/images" && request.method === "POST") {
+        return await uploadProductImage(request, env, headers, url);
+      }
+      let m = url.pathname.match(/^\/admin\/products\/([^/]+)\/status$/);
+      if (m && request.method === "PATCH") {
+        return await adminSetProductStatus(request, env, headers, decodeURIComponent(m[1]));
+      }
+      m = url.pathname.match(/^\/admin\/products\/([^/]+)$/);
+      if (m && request.method === "PUT") {
+        return await adminUpdateProduct(request, env, headers, decodeURIComponent(m[1]));
+      }
+      if (m && request.method === "DELETE") {
+        return await adminDeleteProduct(request, env, headers, decodeURIComponent(m[1]));
+      }
+
       if (request.method === "POST") {
         return await createOrder(request, env, headers);
       }

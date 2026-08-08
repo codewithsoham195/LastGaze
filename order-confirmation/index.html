@@ -211,7 +211,7 @@
       var params = new URLSearchParams(location.search);
       var paidId = params.get('paid') || '';
 
-      var products = window.LASTGAZE_PRODUCTS || [];
+      var products = [];
       function findProduct(lot) {
         return products.filter(function (p) { return p.lot === lot; })[0];
       }
@@ -301,11 +301,14 @@
       // session showing up if someone revisits an old confirmation link.
       if (order && paidId && order.payment_id !== paidId) order = null;
 
-      if (order) {
-        renderOrder(order);
-      } else {
-        tryLoadFromAccount();
-      }
+      window.LG_PRODUCTS_READY.then(function (loaded) {
+        products = loaded;
+        if (order) {
+          renderOrder(order);
+        } else {
+          tryLoadFromAccount();
+        }
+      });
     })();
   </script>
 </body>

@@ -352,7 +352,7 @@
   <script src="/assets/checkout.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var products = window.LASTGAZE_PRODUCTS || [];
+      var products = [];
       var listEl = document.getElementById('bagList');
       var emptyEl = document.getElementById('bagEmpty');
       var summaryEl = document.getElementById('bagSummary');
@@ -411,7 +411,10 @@
         });
       }
 
-      render();
+      window.LG_PRODUCTS_READY.then(function (loaded) {
+        products = loaded;
+        render();
+      });
     });
   </script>
 </body>

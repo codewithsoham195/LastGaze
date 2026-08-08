@@ -51,6 +51,39 @@
     .adm-msg-date { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.4); }
     .adm-msg-subject { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(5,5,5,.4); margin-bottom: 10px; }
     .adm-msg-body { font-family: var(--body); font-size: 14px; line-height: 1.55; color: rgba(5,5,5,.85); white-space: pre-line; }
+
+    .adm-publish-bar { display: none; align-items: center; justify-content: space-between; gap: 14px; background: #050505; color: #fff; padding: 14px 20px; margin-bottom: 20px; flex-wrap: wrap; }
+    .adm-publish-bar.is-visible { display: flex; }
+    .adm-publish-bar p { margin: 0; font-family: var(--body); font-size: 14px; }
+    .adm-publish-btn { background: #fff; color: #050505; border: 0; padding: 10px 18px; font-family: var(--util); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+    .adm-publish-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .adm-add-btn { background: #050505; color: #fff; border: 0; padding: 10px 18px; font-family: var(--util); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+    .adm-product { border: 1px solid rgba(5,5,5,.14); padding: 18px 20px; margin-bottom: 14px; display: flex; gap: 16px; align-items: flex-start; }
+    .adm-product-thumb { width: 64px; height: 64px; flex: 0 0 64px; background: rgba(5,5,5,.05); overflow: hidden; }
+    .adm-product-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .adm-product-body { flex: 1; min-width: 0; }
+    .adm-product-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+    .adm-product-name { font-family: var(--body); font-size: 15px; color: #050505; }
+    .adm-product-lot { font-family: var(--util); font-size: 11px; color: rgba(5,5,5,.5); margin-right: 8px; }
+    .adm-product-price { font-family: var(--util); font-size: 12px; color: rgba(5,5,5,.7); }
+    .adm-status { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border: 1px solid rgba(5,5,5,.3); }
+    .adm-status.is-live { background: #050505; color: #fff; border-color: #050505; }
+    .adm-product-actions { display: flex; gap: 16px; margin-top: 10px; }
+    .adm-product-actions button { background: transparent; border: 0; color: rgba(5,5,5,.5); font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0; }
+    .adm-product-actions button:hover { color: #050505; }
+
+    #admin-product-form { border: 1px solid rgba(5,5,5,.14); padding: 24px; margin-bottom: 24px; }
+    .adm-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+    .adm-form-grid .pg-field.span-2 { grid-column: 1 / -1; }
+    .adm-form-checks { display: flex; gap: 22px; flex-wrap: wrap; margin: 4px 0 4px; }
+    .adm-form-checks label { display: flex; align-items: center; gap: 8px; font-family: var(--util); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: rgba(5,5,5,.7); }
+    .adm-image-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .adm-image-item { position: relative; width: 76px; height: 76px; border: 1px solid rgba(5,5,5,.14); }
+    .adm-image-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .adm-image-item.is-cover::after { content: 'Cover'; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(5,5,5,.75); color: #fff; font-family: var(--util); font-size: 8px; letter-spacing: .06em; text-transform: uppercase; text-align: center; padding: 2px 0; }
+    .adm-image-remove { position: absolute; top: -8px; right: -8px; width: 18px; height: 18px; border-radius: 50%; background: #050505; color: #fff; border: 0; font-size: 11px; line-height: 18px; cursor: pointer; padding: 0; }
+    .adm-form-actions { display: flex; gap: 14px; align-items: center; margin-top: 22px; }
+    textarea.pg-input { min-height: 90px; resize: vertical; font-family: var(--body); }
   </style>
 </head>
 <body class="paper pg">
@@ -86,6 +119,7 @@
       <div class="pg-tabs">
         <button type="button" class="pg-tab is-active" data-admin-tab="orders">Orders</button>
         <button type="button" class="pg-tab" data-admin-tab="messages">Messages</button>
+        <button type="button" class="pg-tab" data-admin-tab="products">Products</button>
       </div>
 
       <div id="admin-orders-panel">
@@ -103,10 +137,87 @@
         <div id="admin-message-list"></div>
       </div>
 
+      <div id="admin-products-panel" style="display:none">
+        <div class="adm-publish-bar" id="admin-publish-bar">
+          <p id="admin-publish-msg"></p>
+          <button type="button" class="adm-publish-btn" id="admin-publish-btn">Publish</button>
+        </div>
+
+        <div class="adm-toolbar">
+          <span class="adm-count" id="admin-product-count"></span>
+          <button type="button" class="adm-add-btn" id="admin-add-product-btn">+ Add product</button>
+        </div>
+
+        <form id="admin-product-form" class="pg-fieldset" novalidate style="display:none">
+          <h2 class="pg-h1" id="admin-product-form-title" style="font-size:20px;margin-bottom:20px">Add product</h2>
+          <div class="adm-form-grid">
+            <div class="pg-field">
+              <label class="pg-label" for="pf-lot">Lot number</label>
+              <input class="pg-input" type="text" id="pf-lot" required>
+            </div>
+            <div class="pg-field">
+              <label class="pg-label" for="pf-name">Name</label>
+              <input class="pg-input" type="text" id="pf-name" required>
+            </div>
+            <div class="pg-field">
+              <label class="pg-label" for="pf-era">Era / label</label>
+              <input class="pg-input" type="text" id="pf-era" placeholder="e.g. Vintage denim">
+            </div>
+            <div class="pg-field">
+              <label class="pg-label" for="pf-cat">Category</label>
+              <select class="pg-input" id="pf-cat">
+                <option value="denim">Denim</option>
+                <option value="tees">Tees</option>
+                <option value="headwear">Headwear</option>
+                <option value="outerwear">Outerwear</option>
+                <option value="accessories">Accessories</option>
+              </select>
+            </div>
+            <div class="pg-field">
+              <label class="pg-label" for="pf-price">Price (₹)</label>
+              <input class="pg-input" type="number" id="pf-price" min="0" step="1" required>
+            </div>
+            <div class="pg-field">
+              <label class="pg-label" for="pf-size">Size</label>
+              <input class="pg-input" type="text" id="pf-size">
+            </div>
+            <div class="pg-field span-2">
+              <label class="pg-label" for="pf-condition">Condition</label>
+              <textarea class="pg-input" id="pf-condition"></textarea>
+            </div>
+            <div class="pg-field span-2">
+              <label class="pg-label" for="pf-measure">Measurements (one per line)</label>
+              <textarea class="pg-input" id="pf-measure" placeholder="Waist: 34&#10;Length: 42"></textarea>
+            </div>
+            <div class="pg-field span-2">
+              <div class="adm-form-checks">
+                <label><input type="checkbox" id="pf-isnew"> New arrival</label>
+                <label><input type="checkbox" id="pf-sale"> On sale</label>
+                <label><input type="checkbox" id="pf-sold"> Sold</label>
+                <label><input type="checkbox" id="pf-comingsoon"> Coming soon</label>
+              </div>
+            </div>
+            <div class="pg-field span-2">
+              <label class="pg-label" for="pf-images">Photos — first uploaded is the cover image</label>
+              <input type="file" id="pf-images" accept="image/*" multiple>
+              <div class="adm-image-list" id="pf-image-list"></div>
+            </div>
+          </div>
+          <div class="adm-form-actions">
+            <button class="pg-btn" type="submit" id="pf-save-btn">Save product</button>
+            <button class="pg-link-btn" type="button" id="pf-cancel-btn">Cancel</button>
+            <p class="pg-form-msg" id="admin-product-form-msg" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+
+        <div id="admin-product-list"></div>
+      </div>
+
     </div>
 
   </main>
 
   <script src="/admin/admin.js"></script>
+  <script src="/admin/products.js"></script>
 </body>
 </html>

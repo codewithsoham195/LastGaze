@@ -1,14 +1,15 @@
 /* ============================================================
-   LASTGAZE — STOCK FILE
-   This is the ONLY file you edit each week.
-   1. Drop photos into  /img/   (name them anything)
-   2. Add or edit an object below
-   3. Save, push. Done.
+   LASTGAZE — product catalog loader
+   The catalog itself is no longer edited here. Add, edit, and
+   publish products from the admin page's Products tab — see
+   admin/README.md. This file just fetches whatever's currently
+   published and makes it available the same way the old static
+   array did: window.LASTGAZE_PRODUCTS.
 
-   image: ""        -> renders an empty archive frame (no stock photo)
-   image: "/img/x.jpg" -> renders your photo (must start with a slash)
-   sold: true       -> greys the card, strikes the price
-   comingSoon: true -> displays a preview without enabling checkout
+   Because that fetch is async, anything that reads
+   window.LASTGAZE_PRODUCTS must wait on window.LG_PRODUCTS_READY
+   first (a promise that resolves with the same array). See
+   assets/site.js's renderGrid()/renderPDP() for the pattern.
    ============================================================ */
 
 window.LASTGAZE_DROP = {
@@ -17,61 +18,15 @@ window.LASTGAZE_DROP = {
   password: "lastgaze"           // change this every drop
 };
 
-window.LASTGAZE_PRODUCTS = [
-  {
-    lot: "009",
-    name: "Hendrix JNS — Dark Wash Bootcut",
-    era: "Vintage denim",
-    cat: "denim",
-    isNew: true,
-    price: 2000,
-    size: "34",
-    sold: false,
-    image: "/img/products/hendrix-jns-01.jpg",
-    images: ["/img/products/hendrix-jns-01.jpg", "/img/products/hendrix-jns-02.jpg"],
-    condition: "8.5/10 — naturally faded dark wash with heavy whiskering throughout. No major stains or tears; light signs of wear consistent with vintage/pre-owned denim. Frayed hems at the leg openings add to the worn-in look. Pockets, stitching, zipper, and button all intact and functional. Relaxed bootcut / straight-flare silhouette in washed black / charcoal blue.",
-    measure: "Waist: 34\"<br>Outseam (Length): 42\"<br>Inseam: 32\"<br>Rise: 10.5\"<br>Leg Opening: 10\""
-  },
-  {
-    lot: "010",
-    name: "Urbanage Design Essentials — Grey Puffer Jacket",
-    era: "Winter outerwear",
-    cat: "outerwear",
-    isNew: true,
-    price: 20000,
-    size: "L",
-    sold: false,
-    image: "/img/products/puffer-grey-01.jpg",
-    images: ["/img/products/puffer-grey-01.jpg", "/img/products/puffer-grey-02.jpg"],
-    condition: "9/10 — like-new condition with no visible stains, tears, or fading. Zipper, snap-button collar closure, and both hand pockets fully functional. Minimal signs of wear consistent with light or no prior use. Relaxed boxy silhouette in solid grey nylon with front zip closure and branded chest/back graphics.",
-    measure: "Chest: 24\"<br>Length: 27\"<br>Shoulder: 20\"<br>Sleeve: 25\""
-  },
-  {
-    lot: "011",
-    name: "STAY — Striped Long Sleeve Tee",
-    era: "Long sleeve tee",
-    cat: "tees",
-    isNew: true,
-    price: 1500,
-    size: "L",
-    sold: false,
-    image: "/img/products/stay-striped-tee-01.jpg",
-    images: ["/img/products/stay-striped-tee-01.jpg"],
-    condition: "9.5/10 — like-new condition with no visible stains, tears, or fading. Crew neckline and cuffs fully intact. Minimal signs of wear consistent with light or no prior use. Relaxed silhouette in black and cream stripe with woven STAY neck label.",
-    measure: "Chest: 22\"<br>Length: 28\"<br>Shoulder: 19\"<br>Sleeve: 25\""
-  },
-  {
-    // TEMPORARY — checkout/admin test listing. Remove once verified.
-    lot: "999",
-    name: "Demo Jeans — DO NOT BUY",
-    era: "Test listing",
-    cat: "denim",
-    price: 1,
-    size: "M",
-    sold: false,
-    image: "/img/products/demo-jeans-999-01.jpg",
-    images: ["/img/products/demo-jeans-999-01.jpg", "/img/products/demo-jeans-999-02.jpg"],
-    condition: "This is a ₹1 test listing used to verify the checkout and admin order flow. Not a real product.",
-    measure: "N/A"
-  }
-];
+window.LASTGAZE_PRODUCTS = [];
+
+window.LG_PRODUCTS_READY = fetch("https://lastgaze-order-worker.l4stgaze.workers.dev/products")
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    window.LASTGAZE_PRODUCTS = Array.isArray(d.products) ? d.products : [];
+    return window.LASTGAZE_PRODUCTS;
+  })
+  .catch(function () {
+    window.LASTGAZE_PRODUCTS = [];
+    return window.LASTGAZE_PRODUCTS;
+  });
