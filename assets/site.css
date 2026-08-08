@@ -1846,10 +1846,12 @@ body.menu-open {
     .pdp {
         grid-template-columns: 1.3fr 1fr
     }
+}
 
-    .pdp .reviews {
-        grid-column: 2
-    }
+.pdp-col {
+    display: grid;
+    gap: 24px;
+    align-content: start
 }
 
 .gallery {
