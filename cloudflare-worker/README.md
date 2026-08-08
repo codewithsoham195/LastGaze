@@ -24,6 +24,15 @@ workers share. No service-to-service call needed, just a shared database.
 Orders are tagged with the buyer's account so they show up under "My
 orders" on `/account/` (see `cloudflare-worker-accounts/README.md`).
 
+**Reviews** are star rating + text + photos, submitted from "My orders" on
+`/account/` and shown on the matching product page. `POST /reviews` checks
+the same shared `orders` table before accepting one — you can only review a
+lot you actually bought — and reviews auto-publish immediately, no
+moderation step. `GET /reviews?lot=...` is public. Photos go through the
+same R2 bucket and `/img-cdn/` route product photos already use (see
+`putImageToR2()`), just under a `reviews/` key prefix instead of
+`products/`.
+
 Also handles the `/contact/` form — `/contact` (public, no account
 needed) records a message, and `/admin/messages` (same `ADMIN_PASSWORD`
 gate as orders) lists them on the `/admin/` page's Messages tab.
@@ -48,19 +57,21 @@ deployed URL.
    Database: the same `lastgaze` D1 database the account worker uses (see
    `cloudflare-worker-accounts/README.md` if you haven't created it yet).
 6. In that D1 database's **Console** tab, run `sold-lots-schema.sql`,
-   `orders-schema.sql`, `messages-schema.sql`, and `products-schema.sql`
-   once each (only needed the first time — `products-schema.sql` also
-   carries over the pieces that used to live in `assets/products.js` so the
-   shop doesn't go blank the moment it switches to fetching from here). If
-   you ran `orders-schema.sql` before it included the `user_id` column,
-   also run `orders-add-user-id.sql` once — skip it on a brand new database.
-   Also run `orders-add-fulfilled.sql` once — it adds the `fulfilled_at`
-   column the admin page's "Order shipped" button needs.
+   `orders-schema.sql`, `messages-schema.sql`, `products-schema.sql`, and
+   `reviews-schema.sql` once each (only needed the first time —
+   `products-schema.sql` also carries over the pieces that used to live in
+   `assets/products.js` so the shop doesn't go blank the moment it switches
+   to fetching from here). If you ran `orders-schema.sql` before it
+   included the `user_id` column, also run `orders-add-user-id.sql` once —
+   skip it on a brand new database. Also run `orders-add-fulfilled.sql`
+   once — it adds the `fulfilled_at` column the admin page's "Order
+   shipped" button needs.
 7. **Bindings** → **Add binding** → **R2 bucket**. Variable name:
    `PRODUCT_IMAGES`. Create a new bucket (e.g. `lastgaze-products`) if you
    don't have one — this is where photos uploaded from the admin Products
-   tab are stored. No public-access toggle needed; the worker streams them
-   back itself at `/img-cdn/...`.
+   tab and buyer reviews are stored (under separate `products/` and
+   `reviews/` key prefixes in the same bucket). No public-access toggle
+   needed; the worker streams them back itself at `/img-cdn/...`.
 8. Copy the worker's URL (`https://lastgaze-order-worker.<your-subdomain>.workers.dev`).
 9. Send that URL back — it goes into `orderEndpoint` in `assets/checkout.js`,
    alongside switching `keyId` to the live key.
@@ -75,6 +86,7 @@ npx wrangler secret put RAZORPAY_KEY_SECRET
 npx wrangler secret put ADMIN_PASSWORD
 npx wrangler d1 execute lastgaze --file=orders-schema.sql --remote
 npx wrangler d1 execute lastgaze --file=products-schema.sql --remote
+npx wrangler d1 execute lastgaze --file=reviews-schema.sql --remote
 npx wrangler r2 bucket create lastgaze-products
 npx wrangler deploy
 ```

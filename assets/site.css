@@ -1992,6 +1992,69 @@ body.menu-open {
     max-width: 52ch
 }
 
+.reviews {
+    max-width: 780px;
+    padding-block: 48px 100px
+}
+
+.rv-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px
+}
+
+.rv-stars {
+    letter-spacing: 2px;
+    font-size: 15px
+}
+
+.rv-stars-lg {
+    font-size: 20px
+}
+
+.rv-card {
+    border-top: 1px solid var(--line);
+    padding: 20px 0
+}
+
+.rv-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px
+}
+
+.rv-body {
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 60ch;
+    margin: 0 0 12px
+}
+
+.rv-photos {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap
+}
+
+.rv-photo {
+    width: 64px;
+    height: 64px;
+    overflow: hidden;
+    background: var(--veil)
+}
+
+.rv-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
 
 /* ============================================================
    FOOTER

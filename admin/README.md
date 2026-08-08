@@ -58,3 +58,12 @@ Click **Order shipped** on a card once you've packed and sent it — that
 marks it fulfilled and drops it off this list for good (it isn't shown
 anywhere else in the admin page). This needs `orders-add-fulfilled.sql` run
 against the D1 database once — see `cloudflare-worker/README.md`.
+
+## Reviews aren't managed here
+
+There's no Reviews tab on this page by design — buyers leave star ratings,
+text, and photos themselves from "My orders" on `/account/` (only for lots
+they actually bought), and a review goes live on the product page the
+moment it's submitted, with no admin approval step. See the "Reviews"
+section of `cloudflare-worker/README.md` for how that's enforced
+server-side.

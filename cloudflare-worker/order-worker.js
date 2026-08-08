@@ -534,8 +534,10 @@ function guessExtension(contentType, filename) {
   return IMAGE_EXT_BY_TYPE[contentType] || "jpg";
 }
 
-async function uploadProductImage(request, env, headers, url) {
-  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+// Shared by the admin product-image upload and the buyer review-image
+// upload — same bucket, same /img-cdn/ serving path, different key
+// prefix so the two never collide.
+async function putImageToR2(request, env, headers, url, keyPrefix) {
   if (!env.PRODUCT_IMAGES) return json({ error: "Image storage not configured" }, 500, headers);
 
   const contentType = request.headers.get("Content-Type") || "application/octet-stream";
@@ -545,12 +547,23 @@ async function uploadProductImage(request, env, headers, url) {
 
   const filename = url.searchParams.get("filename") || "";
   const ext = guessExtension(contentType, filename);
-  const key = "products/" + crypto.randomUUID() + "." + ext;
+  const key = keyPrefix + "/" + crypto.randomUUID() + "." + ext;
 
   const bytes = await request.arrayBuffer();
   await env.PRODUCT_IMAGES.put(key, bytes, { httpMetadata: { contentType: contentType } });
 
   return json({ url: url.origin + "/img-cdn/" + key }, 201, headers);
+}
+
+async function uploadProductImage(request, env, headers, url) {
+  if (!checkAdminAuth(request, env)) return json({ error: "Unauthorized" }, 401, headers);
+  return await putImageToR2(request, env, headers, url, "products");
+}
+
+async function uploadReviewImage(request, env, headers, url) {
+  const userId = await resolveSessionUserId(request, env);
+  if (!userId) return json({ error: "Sign in required" }, 401, headers);
+  return await putImageToR2(request, env, headers, url, "reviews");
 }
 
 // Public, unauthenticated — this is what <img> tags on the storefront
@@ -566,6 +579,101 @@ async function serveProductImage(env, key) {
   headers.set("Cache-Control", "public, max-age=31536000, immutable");
   headers.set("ETag", obj.httpEtag);
   return new Response(obj.body, { headers: headers });
+}
+
+/* ---------------------------------------------------------------
+   Reviews — star rating + photos, restricted to buyers who actually
+   purchased the lot (never trusted from the browser — checked
+   against the same orders table checkout writes to). Auto-publish,
+   no moderation step: a review is visible the moment it's saved.
+   --------------------------------------------------------------- */
+
+function isValidRating(n) {
+  return Number.isInteger(n) && n >= 1 && n <= 5;
+}
+
+// Orders store lots as a comma-joined string ("009, 010"), one row per
+// checkout rather than one row per item — so "did this user buy this
+// lot" means splitting each of their orders and checking membership,
+// not a single indexed lookup.
+async function userOwnsLot(env, userId, lot) {
+  const { results } = await env.DB.prepare(
+    "SELECT lots, payment_id FROM orders WHERE user_id = ?"
+  ).bind(userId).all();
+  for (const row of results) {
+    const lots = String(row.lots || "").split(",").map(function (s) { return s.trim(); });
+    if (lots.indexOf(lot) !== -1) return row.payment_id;
+  }
+  return null;
+}
+
+function rowToPublicReview(row) {
+  let images = [];
+  try { images = JSON.parse(row.images || "[]"); } catch (e) { images = []; }
+  return {
+    lot: row.lot,
+    rating: row.rating,
+    body: row.body || "",
+    images: images,
+    reviewerName: row.reviewer_name || "Verified buyer",
+    createdAt: row.created_at
+  };
+}
+
+async function submitReview(request, env, headers) {
+  const userId = await resolveSessionUserId(request, env);
+  if (!userId) return json({ error: "Sign in required" }, 401, headers);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return json({ error: "Invalid JSON" }, 400, headers);
+  }
+
+  const lot = String(body.lot || "").trim();
+  const rating = Number(body.rating);
+  if (!lot) return json({ error: "Missing lot" }, 400, headers);
+  if (!isValidRating(rating)) return json({ error: "Rating must be 1-5" }, 400, headers);
+
+  const paymentId = await userOwnsLot(env, userId, lot);
+  if (!paymentId) return json({ error: "You can only review pieces you've purchased" }, 403, headers);
+
+  const reviewBody = String(body.body || "").trim().slice(0, 4000);
+  const images = JSON.stringify(Array.isArray(body.images) ? body.images.slice(0, 6) : []);
+
+  // reviewer_name is captured at write time so a public read never has to
+  // join against users (which would risk leaking email addresses).
+  const user = await env.DB.prepare("SELECT full_name, email FROM users WHERE id = ?").bind(userId).first();
+  const reviewerName = (user && user.full_name) || (user && user.email ? user.email.split("@")[0] : "Verified buyer");
+
+  await env.DB.prepare(
+    "INSERT INTO reviews (id, lot, user_id, payment_id, rating, body, images, reviewer_name) " +
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+    "ON CONFLICT(user_id, lot) DO UPDATE SET rating=excluded.rating, body=excluded.body, images=excluded.images, payment_id=excluded.payment_id, created_at=datetime('now')"
+  ).bind(crypto.randomUUID(), lot, userId, paymentId, rating, reviewBody, images, reviewerName).run();
+
+  const row = await env.DB.prepare("SELECT * FROM reviews WHERE user_id = ? AND lot = ?").bind(userId, lot).first();
+  return json({ review: rowToPublicReview(row) }, 200, headers);
+}
+
+async function listReviews(env, headers, lot) {
+  if (!lot) return json({ error: "Missing lot" }, 400, headers);
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM reviews WHERE lot = ? ORDER BY created_at DESC"
+  ).bind(lot).all();
+  const reviews = results.map(rowToPublicReview);
+  const average = reviews.length
+    ? Math.round((reviews.reduce(function (s, r) { return s + r.rating; }, 0) / reviews.length) * 10) / 10
+    : 0;
+  return json({ reviews: reviews, average: average, count: reviews.length }, 200, headers);
+}
+
+async function accountReviews(request, env, headers) {
+  const userId = await resolveSessionUserId(request, env);
+  if (!userId) return json({ error: "Sign in required" }, 401, headers);
+  const { results } = await env.DB.prepare("SELECT * FROM reviews WHERE user_id = ?").bind(userId).all();
+  return json({ reviews: results.map(rowToPublicReview) }, 200, headers);
 }
 
 export default {
@@ -631,6 +739,20 @@ export default {
       }
       if (m && request.method === "DELETE") {
         return await adminDeleteProduct(request, env, headers, decodeURIComponent(m[1]));
+      }
+
+      // Reviews — public read, signed-in-and-purchased write.
+      if (url.pathname === "/reviews" && request.method === "GET") {
+        return await listReviews(env, headers, url.searchParams.get("lot"));
+      }
+      if (url.pathname === "/reviews" && request.method === "POST") {
+        return await submitReview(request, env, headers);
+      }
+      if (url.pathname === "/reviews/images" && request.method === "POST") {
+        return await uploadReviewImage(request, env, headers, url);
+      }
+      if (url.pathname === "/account/reviews" && request.method === "GET") {
+        return await accountReviews(request, env, headers);
       }
 
       if (request.method === "POST") {

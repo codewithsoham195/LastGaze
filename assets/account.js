@@ -15,6 +15,11 @@ var LG_ACCOUNT_CONFIG = {
 (function () {
   var TOKEN_KEY = 'lg_session_token';
 
+  // Reviews live on the order worker (same one products/checkout use),
+  // not the account worker above — a different deployed service.
+  var REVIEWS_API_BASE = "https://lastgaze-order-worker.l4stgaze.workers.dev";
+  var reviewsByLot = {};
+
   function getToken() {
     return localStorage.getItem(TOKEN_KEY) || '';
   }
@@ -176,6 +181,39 @@ var LG_ACCOUNT_CONFIG = {
     return products.filter(function (p) { return p.lot === lot; })[0];
   }
 
+  function starsHtml(rating, interactive) {
+    var out = '';
+    for (var i = 1; i <= 5; i++) {
+      var filled = i <= rating;
+      out += interactive
+        ? '<span data-star="' + i + '">' + (filled ? '★' : '☆') + '</span>'
+        : (filled ? '★' : '☆');
+    }
+    return out;
+  }
+
+  function reviewFormHtml(lot, existing) {
+    var rating = existing ? existing.rating : 0;
+    var body = existing ? existing.body : '';
+    var images = existing ? (existing.images || []) : [];
+    return '' +
+      '<div class="rv-form" data-review-form data-lot="' + escapeHtml(lot) + '" style="display:none">' +
+      '<div class="rv-picker" data-star-picker>' + starsHtml(rating, true) + '</div>' +
+      '<input type="hidden" data-rating value="' + rating + '">' +
+      '<textarea class="pg-input" data-review-body placeholder="How\'s the piece?" rows="3">' + escapeHtml(body) + '</textarea>' +
+      '<div class="rv-form-row">' +
+      '<label class="rv-add-photo">+ Add photos<input type="file" data-review-photos accept="image/*" multiple style="display:none"></label>' +
+      '<div class="rv-form-photos" data-review-photo-list>' +
+      images.map(function (src) {
+        return '<div class="rv-photo" data-photo><img src="' + escapeHtml(src) + '"><button type="button" data-remove-photo aria-label="Remove photo">&times;</button></div>';
+      }).join('') +
+      '</div></div>' +
+      '<div class="rv-form-actions">' +
+      '<button type="button" class="pg-btn" data-review-submit>Submit review</button>' +
+      '<span class="pg-form-msg" data-review-msg></span>' +
+      '</div></div>';
+  }
+
   function renderOrders(orders) {
     if (!orders.length) {
       ordersList.innerHTML = '<p class="pg-form-msg" style="margin:0 0 20px;">No orders yet.</p>';
@@ -189,39 +227,176 @@ var LG_ACCOUNT_CONFIG = {
         var thumb = img
           ? '<img src="' + img + '" alt="' + escapeHtml(p.name || lot) + '">'
           : '';
+        var existingReview = reviewsByLot[lot];
         return '' +
           '<div class="ord-item">' +
           '<div class="ord-item-frame">' + thumb + '</div>' +
-          '<div>' +
+          '<div class="ord-item-info">' +
           '<div class="ord-item-name">' + escapeHtml(p.name || ('Lot ' + lot)) + '</div>' +
           '<div class="ord-item-meta">Lot ' + escapeHtml(lot) + '</div>' +
-          '</div></div>';
+          '</div>' +
+          '<button type="button" class="ord-review-btn" data-review-toggle data-lot="' + escapeHtml(lot) + '">' +
+          (existingReview ? 'Edit review' : 'Leave a review') + '</button>' +
+          '</div>' +
+          reviewFormHtml(lot, existingReview);
       }).join('');
       var placed = o.created_at
         ? new Date(o.created_at.replace(' ', 'T') + 'Z').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
         : '';
       return '' +
-        '<a class="ord-card" href="/order-confirmation/?paid=' + encodeURIComponent(o.payment_id || '') + '">' +
+        '<div class="ord-card" data-payment-id="' + escapeHtml(o.payment_id || '') + '">' +
         '<div class="ord-card-top">' +
         '<span class="ord-date">' + escapeHtml(placed) + '</span>' +
-        '<span class="ord-ref">' + escapeHtml(o.payment_id || '') + '</span>' +
+        '<a class="ord-ref" href="/order-confirmation/?paid=' + encodeURIComponent(o.payment_id || '') + '">' + escapeHtml(o.payment_id || '') + '</a>' +
         '</div>' +
         itemsHtml +
         '<div class="ord-total"><span>Total paid</span><strong>' + inr(o.amount) + '</strong></div>' +
-        '</a>';
+        '</div>';
     }).join('');
   }
 
   function loadOrders() {
     // findProduct() below reads window.LASTGAZE_PRODUCTS — wait for the
     // catalog fetch alongside the orders fetch so it's populated by the
-    // time renderOrders() looks up each item's thumbnail.
-    Promise.all([api('/account/orders', { method: 'GET' }), window.LG_PRODUCTS_READY]).then(function (results) {
+    // time renderOrders() looks up each item's thumbnail. Reviews load
+    // alongside too, so "Leave a review" vs "Edit review" is right from
+    // the first paint instead of flipping a beat later.
+    Promise.all([
+      api('/account/orders', { method: 'GET' }),
+      window.LG_PRODUCTS_READY,
+      fetchMyReviews()
+    ]).then(function (results) {
       renderOrders(results[0].orders || []);
     }).catch(function () {
       ordersList.innerHTML = '<p class="pg-form-msg">Could not load orders.</p>';
     });
   }
+
+  function fetchMyReviews() {
+    return fetch(REVIEWS_API_BASE + '/account/reviews', {
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    }).then(function (r) { return r.ok ? r.json() : { reviews: [] }; })
+      .then(function (data) {
+        reviewsByLot = {};
+        (data.reviews || []).forEach(function (r) { reviewsByLot[r.lot] = r; });
+      }).catch(function () { reviewsByLot = {}; });
+  }
+
+  function uploadReviewImage(file) {
+    return fetch(REVIEWS_API_BASE + '/reviews/images?filename=' + encodeURIComponent(file.name), {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + getToken(),
+        'Content-Type': file.type || 'application/octet-stream'
+      },
+      body: file
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok) throw new Error(data.error || 'Photo upload failed');
+        return data;
+      });
+    });
+  }
+
+  function submitReview(lot, payload) {
+    return fetch(REVIEWS_API_BASE + '/reviews', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + getToken(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok) throw new Error(data.error || 'Could not submit review');
+        return data;
+      });
+    });
+  }
+
+  // One delegated listener on the whole list handles every order's star
+  // picker, photo upload, and submit — renderOrders() rebuilds the list
+  // wholesale, so per-element listeners would need re-attaching on every
+  // render (and would drop an in-progress form the user is filling in).
+  ordersList.addEventListener('click', function (e) {
+    var toggleBtn = e.target.closest('[data-review-toggle]');
+    if (toggleBtn) {
+      var form = toggleBtn.closest('.ord-item').nextElementSibling;
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      return;
+    }
+
+    var star = e.target.closest('[data-star]');
+    if (star) {
+      var picker = star.closest('[data-star-picker]');
+      var n = Number(star.dataset.star);
+      picker.parentElement.querySelector('[data-rating]').value = n;
+      picker.querySelectorAll('[data-star]').forEach(function (s) {
+        s.textContent = Number(s.dataset.star) <= n ? '★' : '☆';
+      });
+      return;
+    }
+
+    var removePhoto = e.target.closest('[data-remove-photo]');
+    if (removePhoto) {
+      removePhoto.closest('[data-photo]').remove();
+      return;
+    }
+
+    var submitBtn = e.target.closest('[data-review-submit]');
+    if (submitBtn) {
+      var formEl = submitBtn.closest('[data-review-form]');
+      var lot = formEl.dataset.lot;
+      var rating = Number(formEl.querySelector('[data-rating]').value);
+      var msg = formEl.querySelector('[data-review-msg]');
+      if (!rating) {
+        msg.textContent = 'Pick a star rating first.';
+        return;
+      }
+      var images = Array.prototype.map.call(formEl.querySelectorAll('[data-photo] img'), function (img) { return img.src; });
+      submitBtn.disabled = true;
+      msg.textContent = 'Saving…';
+      submitReview(lot, {
+        lot: lot,
+        rating: rating,
+        body: formEl.querySelector('[data-review-body]').value.trim(),
+        images: images
+      }).then(function (data) {
+        reviewsByLot[lot] = data.review;
+        msg.textContent = 'Review saved.';
+        var toggle = formEl.previousElementSibling.querySelector('[data-review-toggle]');
+        if (toggle) toggle.textContent = 'Edit review';
+      }).catch(function (err) {
+        msg.textContent = err.message;
+      }).then(function () {
+        submitBtn.disabled = false;
+      });
+    }
+  });
+
+  ordersList.addEventListener('change', function (e) {
+    var input = e.target.closest('[data-review-photos]');
+    if (!input || !input.files.length) return;
+    var form = input.closest('[data-review-form]');
+    var list = form.querySelector('[data-review-photo-list]');
+    var msg = form.querySelector('[data-review-msg]');
+    var files = Array.prototype.slice.call(input.files);
+    msg.textContent = 'Uploading…';
+    files.reduce(function (chain, file) {
+      return chain.then(function () {
+        return uploadReviewImage(file).then(function (data) {
+          var div = document.createElement('div');
+          div.className = 'rv-photo';
+          div.setAttribute('data-photo', '');
+          div.innerHTML = '<img src="' + data.url + '"><button type="button" data-remove-photo aria-label="Remove photo">&times;</button>';
+          list.appendChild(div);
+        });
+      });
+    }, Promise.resolve())
+      .then(function () { msg.textContent = ''; })
+      .catch(function (err) { msg.textContent = err.message; })
+      .then(function () { input.value = ''; });
+  });
 
   function renderAddresses(addresses) {
     if (!addresses.length) {

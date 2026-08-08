@@ -171,18 +171,34 @@
     .pg-address-card__body { color: rgba(5,5,5,.75); }
     .pg-form-msg { color: rgba(5,5,5,.38); }
 
-    .ord-card { display: block; border: 1px solid rgba(5,5,5,.14); padding: 18px 20px; margin-bottom: 14px; cursor: pointer; transition: border-color .15s; }
-    .ord-card:hover { border-color: rgba(5,5,5,.35); }
+    .ord-card { display: block; border: 1px solid rgba(5,5,5,.14); padding: 18px 20px; margin-bottom: 14px; }
     .ord-card-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
     .ord-date { font-family: var(--util); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(5,5,5,.4); }
-    .ord-ref { font-family: var(--util); font-size: 9px; letter-spacing: .08em; color: rgba(5,5,5,.3); }
-    .ord-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+    .ord-ref { font-family: var(--util); font-size: 9px; letter-spacing: .08em; color: rgba(5,5,5,.3); text-decoration: underline; text-underline-offset: 2px; }
+    .ord-ref:hover { color: rgba(5,5,5,.6); }
+    .ord-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap; }
     .ord-item-frame { width: 44px; height: 56px; background: rgba(5,5,5,.06); overflow: hidden; flex-shrink: 0; }
     .ord-item-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ord-item-info { flex: 1; min-width: 120px; }
     .ord-item-name { font-family: var(--body); font-size: 13px; color: #050505; }
     .ord-item-meta { font-family: var(--util); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: rgba(5,5,5,.4); }
+    .ord-review-btn { background: transparent; border: 0; color: rgba(5,5,5,.5); font-family: var(--util); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0; }
+    .ord-review-btn:hover { color: #050505; }
     .ord-total { font-family: var(--util); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.5); padding-top: 12px; margin-top: 6px; border-top: 1px solid rgba(5,5,5,.1); display: flex; justify-content: space-between; }
     .ord-total strong { color: #050505; font-family: var(--body); font-size: 14px; letter-spacing: normal; text-transform: none; }
+
+    .rv-form { border: 1px solid rgba(5,5,5,.14); background: rgba(5,5,5,.02); padding: 16px; margin: 0 0 14px; }
+    .rv-picker { font-size: 20px; letter-spacing: 4px; margin-bottom: 12px; cursor: pointer; }
+    .rv-picker span { display: inline-block; }
+    .rv-form textarea.pg-input { width: 100%; min-height: 70px; resize: vertical; font-family: var(--body); font-size: 13px; margin-bottom: 14px; }
+    .rv-form-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .rv-add-photo { font-family: var(--util); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(5,5,5,.5); border: 1px dashed rgba(5,5,5,.28); padding: 8px 12px; cursor: pointer; }
+    .rv-add-photo:hover { color: #050505; border-color: rgba(5,5,5,.5); }
+    .rv-form-photos { display: flex; gap: 8px; flex-wrap: wrap; }
+    .rv-photo { position: relative; width: 44px; height: 44px; border: 1px solid rgba(5,5,5,.14); }
+    .rv-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rv-photo [data-remove-photo] { position: absolute; top: -7px; right: -7px; width: 16px; height: 16px; border-radius: 50%; background: #050505; color: #fff; border: 0; font-size: 10px; line-height: 16px; cursor: pointer; padding: 0; }
+    .rv-form-actions { display: flex; align-items: center; gap: 14px; }
   </style>
 
   <script src="/assets/products.js"></script>
