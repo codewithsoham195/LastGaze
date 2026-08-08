@@ -50,12 +50,7 @@
       root.innerHTML = '';
       return;
     }
-    root.innerHTML = '' +
-      '<div class="rv-summary">' +
-      '<span class="rv-stars rv-stars-lg">' + stars(data.average) + '</span>' +
-      '<span class="lab dim">' + data.average + ' · ' + data.count + (data.count === 1 ? ' review' : ' reviews') + '</span>' +
-      '</div>' +
-      '<div class="rv-list">' + data.reviews.map(reviewCard).join('') + '</div>';
+    root.innerHTML = '<div class="rv-list">' + data.reviews.map(reviewCard).join('') + '</div>';
   }
 
   function init() {

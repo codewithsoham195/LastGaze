@@ -1846,6 +1846,10 @@ body.menu-open {
     .pdp {
         grid-template-columns: 1.3fr 1fr
     }
+
+    .pdp .reviews {
+        grid-column: 2
+    }
 }
 
 .gallery {
@@ -1993,17 +1997,14 @@ body.menu-open {
 }
 
 .reviews {
-    max-width: 780px;
-    padding-block: 48px 100px
+    border: 1px solid var(--line);
+    padding: 20px 22px
 }
 
-.rv-summary {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 4px
+.reviews:empty {
+    display: none;
+    border: 0;
+    padding: 0
 }
 
 .rv-stars {
@@ -2011,13 +2012,12 @@ body.menu-open {
     font-size: 15px
 }
 
-.rv-stars-lg {
-    font-size: 20px
+.rv-card {
+    padding: 16px 0
 }
 
-.rv-card {
-    border-top: 1px solid var(--line);
-    padding: 20px 0
+.rv-card + .rv-card {
+    border-top: 1px solid var(--line)
 }
 
 .rv-top {
